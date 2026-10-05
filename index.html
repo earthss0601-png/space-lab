@@ -1009,7 +1009,8 @@ const maker={
 };
 
 /* ===================== 우주 DNA 포스터 (8단계) ===================== */
-const DNA_STEPS=["활동 안내","내 정보","복습·설문","우주 DNA","천체 고르기","이미지 프롬프트","작품 제목","포스터 프롬프트"];
+const DNA_STEPS=["활동 안내","복습·설문","우주 DNA","천체 고르기","이미지 프롬프트","작품 제목","포스터 프롬프트"];
+const DNA_FN=["s1","s3","s4","s5","s6","s7","s8"];
 const MBTI_Q=[
   ["EI","E","사람들과 함께 있을 때 힘이 나요","I","혼자 조용히 있을 때 힘이 나요"],
   ["SN","S","눈에 보이는 사실이 좋아요","N","상상하고 떠올리는 게 좋아요"],
@@ -1069,7 +1070,7 @@ const dna={
   },
   kind(){ return this.st.obj==="nebula"?(this.st.neb||"emission"):this.st.obj; },
   params(){ const t=this.kind(), m=this.st.mbti, d=DEFAULTS[t];
-    let seed=0; for(const ch of this.who()+this.st.title) seed=(seed*31+ch.charCodeAt(0))>>>0;
+    let seed=0; for(const ch of this.mbti()+(this.st.sv.word||"")+this.st.title) seed=(seed*31+ch.charCodeAt(0))>>>0;
     return {type:t,seed:seed||7,stars:(m.EI==="E"?75:m.EI==="I"?40:d.stars)/100,spread:(m.JP==="P"?75:m.JP==="J"?40:d.spread)/100,temp:d.temp/100,gas:(t==="open"?0:(m.SN==="N"?85:m.SN==="S"?60:d.gas))/100,hue:d.hue}; },
   makeImgPrompt(){
     const S=SCI[this.kind()], m=this.st.mbti, sv=this.st.sv;
@@ -1088,18 +1089,19 @@ const dna={
     return `세로로 긴 과학 포스터를 만들어줘.\n`+
       `① 가운데: ${S.name} 그림을 크게 넣어줘. (${S.look})\n`+
       `② 맨 위: 제목 '${t}'${J(t,"을","를")} 크고 또렷하게 적어줘. 글자 느낌은 ${MOOD[sv.mood]||"신비로운"} 분위기에 맞게.\n`+
-      `③ 제목 아래: '${this.who()}'${J(this.who(),"을","를")} 작게 적어줘.\n`+
-      `④ 아래쪽 설명 상자 3줄:\n`+
+      `③ 아래쪽 설명 상자 3줄:\n`+
       `  - 천체 종류: ${S.group} · ${S.name}\n`+
       `  - 과학적 특징: ${S.sci}\n`+
       `  - 나의 우주 DNA: MBTI ${this.mbti()}, ${sv.word||""} 나, 소중한 것 '${sv.value||""}', 좋아하는 계절 ${sv.season||""}\n`+
-      `⑤ 색 구성: 검은 우주 배경에 ${S.palette} 위주. 전체 분위기는 ${MOOD[sv.mood]||"신비로운"} 느낌으로.\n`+
-      `⑥ 글자는 모두 한글로 또렷하게 써줘.`;
+      `④ 색 구성: 검은 우주 배경에 ${S.palette} 위주. 전체 분위기는 ${MOOD[sv.mood]||"신비로운"} 느낌으로.\n`+
+      `⑤ 글자는 모두 한글로 또렷하게 써줘.`;
   },
   // ---------- 화면 ----------
   render(){
     if(!this.st) this.load();
     const box=$("#dna"); box.innerHTML="";
+    if(this.st.step>DNA_STEPS.length) this.st.step=1;
+    if(this.st.max>DNA_STEPS.length) this.st.max=DNA_STEPS.length;
     const step=this.st.step;
     const bar=el("ol",{class:"stepper"});
     DNA_STEPS.forEach((nm,i)=>{ const n=i+1; const li=el("li",{class:(n===step?"now ":"")+(n<step||n<=this.st.max?"done":"")});
@@ -1107,7 +1109,7 @@ const dna={
       b.addEventListener("click",()=>this.go(n)); li.append(b); bar.append(li); });
     box.append(bar);
     const card=el("div",{class:"card dnacard"}); box.append(card);
-    this["s"+step](card);
+    this[DNA_FN[step-1]](card);
     this.save();
   },
   go(n){ this.st.step=n; this.st.max=Math.max(this.st.max,n); this.render(); scrollTo({top:$("#tab-dna").offsetTop-70,behavior:"smooth"}); },
@@ -1147,7 +1149,7 @@ const dna={
       return true; }});
   },
   s3(c){
-    this.head(c,3,"복습하고 설문에 답하기","먼저 다섯 가지 천체를 다시 읽어 봐요. 그다음 MBTI와 설문에 답해요.");
+    this.head(c,2,"복습하고 설문에 답하기","먼저 다섯 가지 천체를 다시 읽어 봐요. 그다음 MBTI와 설문에 답해요.");
     const rv=el("div",{class:"review5"});
     ["emission","reflection","dark","open","globular"].forEach(t=>{ const S=SCI[t]; const d=el("div",{class:"rv"}); const p=BYK[S.img];
       d.append(photoBox(p,{cap:false}),el("div",{},`${chip(t)}<p>${S.short}</p>`)); rv.append(d); });
@@ -1172,7 +1174,7 @@ const dna={
   },
   s4(c){
     const m=this.st.mbti, sv=this.st.sv, r=this.rec();
-    c.append(el("div",{class:"dnahero"},`${mascotSVG("mascotDna")}<div><span class="kicker">STEP 4</span><h2>나의 우주 DNA가 완성되었습니다!</h2><p class="lead">${esc(this.who())} 님의 답이 잘 반영되었는지 확인해 봐요. 다르면 <b>이전</b>을 눌러 고쳐요.</p></div>`));
+    c.append(el("div",{class:"dnahero"},`${mascotSVG("mascotDna")}<div><span class="kicker">STEP 3</span><h2>나의 우주 DNA가 완성되었습니다!</h2><p class="lead">내가 답한 내용이 잘 반영되었는지 확인해 봐요. 다르면 <b>이전</b>을 눌러 고쳐요.</p></div>`));
     const helix=el("div",{class:"helix","aria-hidden":"true"}); for(let i=0;i<14;i++) helix.append(el("i",{style:`--i:${i}`})); c.append(helix);
     const g=el("div",{class:"dnagrid"});
     MBTI_Q.forEach(q=>{ const l=m[q[0]]; g.append(el("div",{class:"gene"},`<span class="big">${l}</span><span>${MAP[l][1]}</span><small>→ ${MAP[l][0]}</small>`)); });
@@ -1187,7 +1189,7 @@ const dna={
     this.nav(c,{next:"천체 고르러 가기"});
   },
   s5(c){
-    this.head(c,5,"만들고 싶은 천체 고르기","추천과 달라도 괜찮아요. 내가 만들고 싶은 것을 골라요.");
+    this.head(c,4,"만들고 싶은 천체 고르기","추천과 달라도 괜찮아요. 내가 만들고 싶은 것을 골라요.");
     const r=this.rec();
     const g=el("div",{class:"pick3"});
     [["nebula","성운","emission","가스와 먼지의 구름"],["open","산개성단","open","파란 별이 듬성듬성"],["globular","구상성단","globular","붉은 별이 공 모양으로 빽빽"]].forEach(([k,nm,tk,d])=>{
@@ -1207,7 +1209,7 @@ const dna={
     this.nav(c,{next:"프롬프트 만들기",ok:()=>{ if(!this.st.obj) return "천체를 하나 골라 주세요."; if(this.st.obj==="nebula"&&!this.st.neb) return "성운의 종류를 골라 주세요."; this.st.imgPrompt=this.makeImgPrompt(); return true; }});
   },
   s6(c){
-    this.head(c,6,"이미지 프롬프트가 만들어졌어요","설문 결과와 고른 천체의 과학적 특징을 합쳐 만들었어요. 고치고 싶은 곳은 직접 고쳐도 돼요.");
+    this.head(c,5,"이미지 프롬프트가 만들어졌어요","설문 결과와 고른 천체의 과학적 특징을 합쳐 만들었어요. 고치고 싶은 곳은 직접 고쳐도 돼요.");
     const wrap=el("div",{class:"pwrap"});
     const cv=el("canvas",{class:"sky",width:360,height:360}); render(this.params(),cv,360);
     const left=el("div",{class:"pv"}); left.append(cv,el("p",{class:"lead",style:"font-size:.8rem"},"컴퓨터가 그린 미리보기예요. AI는 이 프롬프트로 더 멋진 그림을 그려 줘요."));
@@ -1223,30 +1225,30 @@ const dna={
     this.nav(c,{next:"제목 정하기"});
   },
   s7(c){
-    this.head(c,7,"작품 제목 정하기","포스터 맨 위에 크게 들어갈 제목이에요.");
+    this.head(c,6,"작품 제목 정하기","포스터 맨 위에 크게 들어갈 제목이에요.");
     const S=SCI[this.kind()], sv=this.st.sv;
     const f=el("div",{class:"field"},`<label for="dTitle">작품 제목</label><input type="text" id="dTitle" maxlength="20" placeholder="예: 우정의 구상성단">`);
     c.append(f); const inp=$("#dTitle"); inp.value=this.st.title; inp.addEventListener("input",()=>{ this.st.title=inp.value; this.save(); });
-    const ideas=[`${sv.value}의 ${S.name}`,`${sv.season}밤의 ${sv.word} ${S.name}`,`${this.st.info.name}의 우주 DNA`,`${(MOOD[sv.mood]||"").split(" ")[0]} ${S.group==="성운"?"구름":"별무리"}`].filter(x=>!/undefined/.test(x));
+    const ideas=[`${sv.value}의 ${S.name}`,`${sv.season}밤의 ${sv.word} ${S.name}`,`나만의 우주 DNA`,`${(MOOD[sv.mood]||"").split(" ")[0]} ${S.group==="성운"?"구름":"별무리"}`].filter(x=>!/undefined/.test(x));
     const row=el("div",{class:"opts"}); c.append(el("p",{class:"q"},"반짝이의 제목 아이디어 (눌러서 고르고 고쳐도 돼요)"));
     ideas.forEach(t=>{ const b=el("button",{type:"button",class:"opt sm"},esc(t)); b.addEventListener("click",()=>{ inp.value=this.st.title=t; this.save(); inp.focus(); }); row.append(b); });
     c.append(row);
     this.nav(c,{next:"포스터 프롬프트 만들기",ok:()=>{ if(this.st.title.trim().length<2) return "제목을 2글자 이상 적어 주세요."; this.st.posterPrompt=this.makePosterPrompt(); return true; }});
   },
   s8(c){
-    this.head(c,8,"포스터 프롬프트가 완성됐어요","이미지 프롬프트로 그림을 만든 뒤, 이 프롬프트로 포스터를 만들어요.");
+    this.head(c,7,"포스터 프롬프트가 완성됐어요","이미지 프롬프트로 그림을 만든 뒤, 이 프롬프트로 포스터를 만들어요.");
     const ta=el("textarea",{id:"dPoster",rows:"11"}); ta.value=this.st.posterPrompt||this.makePosterPrompt();
     ta.addEventListener("input",()=>{ this.st.posterPrompt=ta.value; this.save(); });
     const act=el("div",{class:"actions"});
     const cp=el("button",{class:"btn yellow",type:"button"},"포스터 프롬프트 복사"); cp.addEventListener("click",()=>copyText(ta));
     const cp2=el("button",{class:"btn",type:"button"},"이미지 프롬프트 다시 복사"); cp2.addEventListener("click",()=>{ const t=el("textarea"); t.value=this.st.imgPrompt||this.makeImgPrompt(); copyText(t); });
     act.append(cp,cp2);
-    c.append(ta,act,el("p",{class:"tipbox"},"AI가 한글 글자를 이상하게 그리면, 그림만 AI로 만들고 <b>제목과 이름은 Canva 글자 상자로 직접</b> 넣어요."));
+    c.append(ta,act,el("p",{class:"tipbox"},"AI가 한글 글자를 이상하게 그리면, 그림만 AI로 만들고 <b>제목은 Canva 글자 상자로 직접</b> 넣어요."));
     c.append(el("h3",{class:"qh"},"나의 우주 DNA 결과 카드"));
     const cardCv=this.card(); const img=el("img",{class:"dnaimg",alt:"나의 우주 DNA 결과 카드"}); img.src=cardCv.toDataURL("image/png"); c.append(img);
     const a2=el("div",{class:"actions"});
-    const dl=el("button",{class:"btn pink",type:"button"},"결과 카드 PNG로 저장"); dl.addEventListener("click",()=>{ const a=el("a",{href:cardCv.toDataURL("image/png"),download:`우주DNA_${this.st.info.grade}-${this.st.info.cls}-${this.st.info.num}_${this.st.info.name}.png`}); document.body.append(a); a.click(); a.remove(); });
-    const again=el("button",{class:"btn",type:"button"},"처음부터 다시 하기"); again.addEventListener("click",()=>{ const keep=this.st.info; this.st=null; store.set("nebula-dna",{info:keep}); this.load(); this.st.step=2; this.st.max=2; this.render(); });
+    const dl=el("button",{class:"btn pink",type:"button"},"결과 카드 PNG로 저장"); dl.addEventListener("click",()=>{ const a=el("a",{href:cardCv.toDataURL("image/png"),download:`우주DNA_${(this.st.title||"나의우주").replace(/[\\/:*?"<>|]/g,"")}.png`}); document.body.append(a); a.click(); a.remove(); });
+    const again=el("button",{class:"btn",type:"button"},"처음부터 다시 하기"); again.addEventListener("click",()=>{ this.st=null; store.set("nebula-dna",{}); this.load(); this.st.step=2; this.st.max=2; this.render(); });
     a2.append(dl,again); c.append(a2);
     c.append(el("p",{class:"lead"},"완성한 포스터와 결과 카드를 패들렛에 올려요. 포스터에 쓴 프롬프트도 함께 적어요."));
     this.nav(c,{next:null});
@@ -1259,7 +1261,7 @@ const dna={
     x.strokeStyle="#ffd166"; x.lineWidth=8; x.beginPath(); x.roundRect(20,20,W-40,H-40,40); x.stroke();
     x.textBaseline="top"; x.fillStyle="#c3bbef"; x.font="bold 30px "+F; x.fillText("나의 우주 DNA 결과 카드",70,66);
     x.fillStyle="#fbf8ff"; x.font="900 62px "+F; this.fitText(x,this.st.title||"나의 우주",70,112,W-140,62,F,"900");
-    x.fillStyle="#ffd166"; x.font="bold 34px "+F; x.fillText(this.who(),70,198);
+    x.fillStyle="#ffd166"; x.font="bold 34px "+F; x.fillText(`${sv.word||""} 나를 닮은 ${S.name}`,70,198);
     const img=el("canvas"); render(this.params(),img,560); x.save(); x.beginPath(); x.roundRect(70,262,560,560,30); x.clip(); x.drawImage(img,70,262); x.restore();
     const tc={open:"#7ef0d0",globular:"#ffd166",emission:"#ff7b9c",reflection:"#7cc4ff",dark:"#c2b2ec"}[this.kind()];
     x.font="bold 34px "+F; const tl=S.group+" · "+S.name; const tw0=x.measureText(tl).width; x.fillStyle=tc; x.beginPath(); x.roundRect(670,262,tw0+44,58,29); x.fill(); x.fillStyle="#221a4d"; x.fillText(tl,692,273);
