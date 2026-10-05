@@ -1,0 +1,939 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>성단·성운 관측소</title>
+<style>
+/* 레이아웃: 반짝이는 밤하늘 위에 둥근 젤리 카드. 의도적으로 어두운 단일 테마(우주) */
+:root{
+  color-scheme: dark;
+  --sky:#15123b; --sky2:#211c57; --card:#2a2468; --card2:#352d7d; --line:#463c95;
+  --ink:#fbf8ff; --mute:#c3bbef; --dim:#8f86c9;
+  --yellow:#ffd166; --yellow2:#ffb703; --pink:#ff8fc7; --mint:#7ef0d0; --red:#ff6b7f; --good:#6ff0a2; --bad:#ff7b8a;
+  --c-open:#7ef0d0; --c-globular:#ffd166; --c-emission:#ff7b9c; --c-reflection:#7cc4ff; --c-dark:#c2b2ec;
+  --f:"Malgun Gothic","맑은 고딕","Apple SD Gothic Neo",sans-serif;
+  --r:22px;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{background:var(--sky)}
+body{margin:0;font-family:var(--f);font-size:16px;line-height:1.6;color:var(--ink);background:radial-gradient(1200px 700px at 80% -10%,#3a2c86 0%,transparent 60%),radial-gradient(900px 600px at -10% 110%,#40215f 0%,transparent 60%),var(--sky);min-height:100vh;overflow-x:hidden}
+#stars{position:fixed;inset:0;z-index:0;pointer-events:none}
+.wrap{position:relative;z-index:1;max-width:1140px;margin:0 auto;padding-inline:clamp(16px,3vw,28px);padding-block:0 72px}
+h1,h2,h3{margin:0;line-height:1.3;text-wrap:balance}
+h2{font-size:clamp(1.35rem,2.6vw,1.7rem)}
+p{margin:0}
+a{color:var(--yellow)}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--yellow);outline-offset:3px}
+b{font-weight:800}
+
+/* 헤더 */
+header.top{display:flex;align-items:center;gap:16px;padding-block:22px 10px;flex-wrap:wrap}
+.mascot{width:72px;height:72px;flex:none;filter:drop-shadow(0 6px 14px rgba(255,209,102,.35));animation:float 3.2s ease-in-out infinite}
+.mascot .eyes{transform-origin:60px 58px;animation:blink 4.5s infinite}
+@keyframes float{50%{transform:translateY(-7px) rotate(-4deg)}}
+@keyframes blink{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.1)}}
+.mascot.happy{animation:hop .6s ease}
+.mascot.sad{animation:shake .5s ease}
+@keyframes hop{30%{transform:translateY(-22px) rotate(10deg) scale(1.08)}60%{transform:translateY(0) rotate(-6deg)}}
+.brand h1{font-size:clamp(1.6rem,4vw,2.3rem);font-weight:900;letter-spacing:-.02em}
+.brand h1 span{color:var(--yellow)}
+.brand p{color:var(--mute);font-size:.95rem}
+.bubble{margin-left:auto;background:var(--ink);color:var(--sky);border-radius:18px;padding:10px 16px;font-weight:700;font-size:.95rem;position:relative;max-width:340px}
+.bubble::before{content:"";position:absolute;left:-8px;top:50%;margin-top:-8px;border:8px solid transparent;border-right-color:var(--ink);border-left:0}
+@media (max-width:700px){.bubble{display:none}}
+
+/* 탭 */
+nav.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;padding-block:10px;margin-bottom:22px;background:linear-gradient(var(--sky) 70%,transparent)}
+nav.tabs .in{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;max-width:1140px;margin:0 auto;padding-inline:clamp(16px,3vw,28px)}
+nav.tabs button{flex:none;border:0;border-radius:999px;padding:10px 18px;background:var(--card);color:var(--mute);font-weight:800;cursor:pointer;box-shadow:0 4px 0 #0003;transition:transform .15s}
+nav.tabs button:hover{transform:translateY(-2px);color:var(--ink)}
+nav.tabs button[aria-selected="true"]{background:var(--yellow);color:#2b2250}
+
+section.page{display:grid;gap:34px;animation:pop-in .4s ease}
+@keyframes pop-in{from{opacity:.4;transform:translateY(10px)}}
+.lead{color:var(--mute);max-width:66ch}
+.lead b{color:var(--ink)}
+
+/* 공통 */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:0;border-radius:16px;padding:11px 18px;background:var(--card2);color:var(--ink);font-weight:800;cursor:pointer;box-shadow:0 5px 0 #0004;transition:transform .12s,box-shadow .12s}
+.btn:hover{transform:translateY(-2px)}
+.btn:active{transform:translateY(3px);box-shadow:0 2px 0 #0004}
+.btn.yellow{background:var(--yellow);color:#2b2250}
+.btn.pink{background:var(--pink);color:#3a1034}
+.chip{display:inline-block;font-size:.8rem;font-weight:800;padding:2px 10px;border-radius:999px;color:#221a4d;background:currentColor;line-height:1.6}
+.chip>span{color:#221a4d}
+.t-open{color:var(--c-open)} .t-globular{color:var(--c-globular)} .t-emission{color:var(--c-emission)} .t-reflection{color:var(--c-reflection)} .t-dark{color:var(--c-dark)}
+.card{background:var(--card);border-radius:var(--r);padding:20px;box-shadow:0 8px 0 #0003}
+.photo{position:relative;border-radius:16px;overflow:hidden;background:#05040f;aspect-ratio:1/1}
+.photo img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s}
+.photo .credit{position:absolute;left:0;right:0;bottom:0;padding:14px 10px 6px;font-size:.66rem;line-height:1.35;color:#ddd;background:linear-gradient(transparent,#000c);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.loader{position:absolute;inset:0;display:grid;place-items:center}
+.loader::after{content:"";width:46px;height:46px;border-radius:50%;border:5px solid #ffffff22;border-top-color:var(--yellow);animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* 배우기 */
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:22px}
+.concept{display:grid;gap:14px;align-content:start}
+.concept .kicker{font-weight:900;font-size:.85rem;letter-spacing:.08em;color:var(--yellow)}
+.concept .def{font-size:1.05rem}
+.concept .def b{color:var(--yellow)}
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.duo figure{margin:0;display:grid;gap:8px;cursor:zoom-in}
+.duo figcaption{font-size:.88rem;color:var(--mute);display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.tbl{overflow-x:auto;border-radius:var(--r);background:var(--card);box-shadow:0 8px 0 #0003}
+table{border-collapse:collapse;width:100%;min-width:560px}
+th,td{padding:12px 16px;text-align:left;border-bottom:2px dashed #ffffff14;vertical-align:top}
+thead th{font-size:1.05rem}
+tbody th{color:var(--mute);white-space:nowrap;width:130px}
+tbody tr:last-child>*{border-bottom:0}
+.neb3{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:18px}
+.neb{display:grid;gap:10px;align-content:start}
+.neb h3{font-size:1.25rem}
+.neb .how{background:#ffffff10;border-radius:14px;padding:10px 12px;font-size:.93rem}
+.neb .ex{font-size:.85rem;color:var(--mute)}
+.path{display:grid;gap:14px}
+.stone{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:start;background:var(--card);border-radius:var(--r);padding:16px 18px;box-shadow:0 6px 0 #0003}
+.stone .q{width:44px;height:44px;border-radius:50%;background:var(--yellow);color:#2b2250;display:grid;place-items:center;font-weight:900;font-size:1.1rem}
+.stone .ans{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.stone .ans span{background:#ffffff12;border-radius:12px;padding:4px 12px;font-size:.9rem}
+
+/* 분류 게임 */
+.game{display:grid;gap:18px}
+.gbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.seg{display:inline-flex;background:var(--card);border-radius:999px;padding:4px;gap:4px;box-shadow:0 4px 0 #0003}
+.seg button{border:0;background:none;border-radius:999px;padding:7px 14px;font-weight:800;color:var(--mute);cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--pink);color:#3a1034}
+.hud{display:flex;gap:10px;flex-wrap:wrap}
+.hud div{background:var(--card);border-radius:14px;padding:6px 14px;font-weight:800;box-shadow:0 4px 0 #0003;font-variant-numeric:tabular-nums}
+.hud .lab{color:var(--dim);font-size:.75rem;display:block;line-height:1.2}
+.hud .combo{color:var(--yellow)}
+.stage{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:22px;align-items:start}
+@media (max-width:820px){.stage{grid-template-columns:1fr}}
+.scope{position:relative;padding:14px;border-radius:30px;background:linear-gradient(145deg,#4a3fa6,#2a2468);box-shadow:0 10px 0 #0004, inset 0 0 0 4px #ffffff10}
+.scope .photo{border-radius:22px;cursor:grab;touch-action:none;user-select:none}
+.scope .photo.drag{cursor:grabbing}
+.scope .photo img{pointer-events:none;-webkit-user-drag:none}
+.scope .photo.enter img{animation:zoom-in .55s cubic-bezier(.2,1.4,.4,1)}
+@keyframes zoom-in{from{transform:scale(.2) rotate(-12deg);opacity:0}}
+.scope .photo.fly{transition:transform .5s cubic-bezier(.5,-.3,.7,1),opacity .5s;opacity:.0}
+.scope .photo.shake{animation:shake .45s}
+@keyframes shake{20%{transform:translateX(-12px) rotate(-2deg)}40%{transform:translateX(10px) rotate(2deg)}60%{transform:translateX(-7px)}80%{transform:translateX(4px)}}
+.scope .tip{position:absolute;top:24px;left:50%;transform:translateX(-50%);background:#000a;border-radius:999px;padding:4px 14px;font-size:.82rem;font-weight:700;white-space:nowrap;pointer-events:none}
+.ghost{position:fixed;z-index:50;width:110px;height:110px;border-radius:18px;overflow:hidden;pointer-events:none;box-shadow:0 10px 30px #000a;transform:translate(-50%,-50%) rotate(-6deg);border:3px solid var(--yellow)}
+.ghost img{width:100%;height:100%;object-fit:cover}
+.side{display:grid;gap:14px}
+.ask{font-size:1.25rem;font-weight:900}
+.bins{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+.bins.two{grid-template-columns:1fr 1fr}
+.bin{position:relative;border:0;cursor:pointer;border-radius:22px;padding:14px 10px 12px;background:var(--card);color:var(--ink);font-weight:900;font-size:1.05rem;display:grid;justify-items:center;gap:6px;box-shadow:0 6px 0 #0004, inset 0 -6px 0 #0002;transition:transform .15s, box-shadow .15s}
+.bin svg{width:58px;height:58px}
+.bin small{font-weight:600;font-size:.75rem;color:var(--mute);line-height:1.3;text-align:center}
+.bin .cnt{position:absolute;top:8px;right:10px;font-size:.78rem;background:#0004;border-radius:999px;padding:0 8px;font-variant-numeric:tabular-nums}
+.bin:hover:not(:disabled),.bin.over{transform:translateY(-4px) scale(1.03);box-shadow:0 10px 0 #0004, 0 0 0 4px currentColor}
+.bin:disabled{cursor:default}
+.bin.gulp{animation:gulp .5s}
+@keyframes gulp{30%{transform:scale(1.15,.85)}60%{transform:scale(.92,1.1)}}
+.bin.right{box-shadow:0 6px 0 #0004,0 0 0 4px var(--good)}
+.bin.wrong{box-shadow:0 6px 0 #0004,0 0 0 4px var(--bad);animation:shake .45s}
+.bin.hintglow{animation:glow 1s ease-in-out infinite}
+@keyframes glow{50%{box-shadow:0 6px 0 #0004,0 0 0 6px var(--good),0 0 30px var(--good)}}
+.bin .lbl{color:var(--ink)}
+@media (max-width:820px){.scope{padding:10px}.scope .photo{aspect-ratio:4/3}.bins{grid-template-columns:repeat(3,1fr);gap:8px}.bin{padding:10px 4px 8px;font-size:.92rem;border-radius:18px}.bin small{display:none}.bin svg{width:40px;height:40px}.ask{font-size:1.05rem}}
+.fb{border-radius:18px;padding:14px 16px;background:var(--card);box-shadow:0 6px 0 #0003;display:grid;gap:6px;animation:pop-in .3s}
+.fb.ok{background:linear-gradient(135deg,#1f6b55,#2a2468)}
+.fb.no{background:linear-gradient(135deg,#7a2a4b,#2a2468)}
+.fb .big{font-size:1.2rem;font-weight:900}
+.fb .nm{font-size:.9rem;color:var(--mute)}
+.progress{height:12px;background:#0004;border-radius:6px;overflow:hidden}
+.progress i{display:block;height:100%;background:linear-gradient(90deg,var(--pink),var(--yellow));border-radius:6px;transition:width .4s}
+.rocket{position:relative;height:0}
+.start{display:grid;gap:18px;justify-items:center;text-align:center;padding:30px 20px}
+.start .mascot{width:120px;height:120px}
+.start h3{font-size:1.5rem}
+.start .row{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+.result{display:grid;gap:18px;justify-items:center;text-align:center;padding:24px 16px}
+.stars3{display:flex;gap:10px;font-size:3.2rem;line-height:1}
+.stars3 span{color:#ffffff22;transform:scale(0);animation:star-pop .5s cubic-bezier(.2,1.6,.4,1) forwards}
+.stars3 span.on{color:var(--yellow);text-shadow:0 0 20px #ffd16688}
+.stars3 span:nth-child(2){animation-delay:.2s} .stars3 span:nth-child(3){animation-delay:.4s}
+@keyframes star-pop{to{transform:scale(1)}}
+.result .score{font-size:2.6rem;font-weight:900;font-variant-numeric:tabular-nums}
+.result .rank{font-size:1.2rem;font-weight:900;color:var(--pink)}
+.rows{display:grid;gap:8px;width:min(420px,100%)}
+.rows div{display:grid;grid-template-columns:96px 1fr 48px;gap:10px;align-items:center;font-size:.9rem}
+.review{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px;width:100%}
+.review button{border:0;padding:0;background:none;cursor:pointer;display:grid;gap:4px;color:var(--ink);font-size:.75rem;text-align:left}
+.review .photo{border:3px solid transparent}
+.review .ok .photo{border-color:var(--good)} .review .no .photo{border-color:var(--bad)}
+.review .mark{position:absolute;top:4px;right:4px;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-weight:900;font-size:.85rem;color:#1a1440}
+.review .ok .mark{background:var(--good)} .review .no .mark{background:var(--bad)}
+
+/* 도감 */
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.filters{display:flex;flex-wrap:wrap;gap:8px}
+.filters button{border:0;border-radius:999px;padding:7px 14px;background:var(--card);cursor:pointer;font-weight:800;color:var(--mute);box-shadow:0 4px 0 #0003}
+.filters button[aria-pressed="true"]{background:currentColor}
+.filters button[aria-pressed="true"] span{color:#221a4d}
+.filters button.all{color:var(--ink)}
+.filters button.all[aria-pressed="true"]{background:var(--ink)}
+.switch{display:inline-flex;gap:8px;align-items:center;cursor:pointer;font-weight:700;color:var(--mute)}
+.switch input{width:20px;height:20px;accent-color:var(--pink)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,170px),1fr));gap:14px}
+.gcard{border:0;padding:8px;background:var(--card);border-radius:20px;cursor:pointer;display:grid;gap:8px;text-align:left;color:var(--ink);box-shadow:0 6px 0 #0003;transition:transform .15s}
+.gcard:hover{transform:translateY(-4px) rotate(-1deg)}
+.gcard .photo{border-radius:14px}
+.gcard .nm{font-size:.85rem;font-weight:700;padding-inline:4px;min-height:2.6em;line-height:1.3;overflow-wrap:anywhere}
+.gcard .meta{padding-inline:4px;display:flex;justify-content:space-between;align-items:center}
+.gcard.q .nm{color:var(--dim)}
+.gcard.flip{animation:flip .5s}
+@keyframes flip{50%{transform:rotateY(90deg)}}
+
+/* 라이트박스 */
+.modal{position:fixed;inset:0;z-index:60;background:#0b0820e6;display:grid;place-items:center;padding:16px;animation:pop-in .25s}
+.modal .box{background:var(--card);border-radius:26px;padding:16px;width:min(760px,100%);max-height:100%;overflow:auto;display:grid;gap:12px;box-shadow:0 12px 0 #0005}
+.modal .big{width:100%;max-height:62vh;object-fit:contain;border-radius:16px;background:#000;display:block}
+.modal .info{display:grid;gap:6px}
+.modal .info h3{font-size:1.3rem}
+.modal .src{font-size:.8rem;color:var(--mute)}
+.actions{display:flex;flex-wrap:wrap;gap:10px}
+
+/* 만들기 */
+.maker{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:22px;align-items:start}
+@media (max-width:880px){.maker{grid-template-columns:1fr}}
+.maker .view{position:sticky;top:76px;display:grid;gap:12px}
+@media (max-width:880px){.maker .view{position:static}}
+canvas.sky{display:block;width:100%;height:auto;aspect-ratio:1/1;max-width:100%;border-radius:18px;background:#000}
+.panel{display:grid;gap:16px}
+.types{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+@media (max-width:480px){.types{grid-template-columns:repeat(3,1fr)}}
+.types button{border:0;border-radius:14px;padding:9px 4px;cursor:pointer;font-weight:800;font-size:.85rem;background:var(--card2);box-shadow:0 4px 0 #0003}
+.types button[aria-pressed="true"]{background:currentColor}
+.types button[aria-pressed="true"] span{color:#221a4d}
+.field{display:grid;gap:6px}
+.field label,.field .lab{font-size:.92rem;font-weight:800;display:flex;justify-content:space-between;gap:8px}
+.field .v{color:var(--yellow);font-weight:700;font-size:.85rem}
+.field .hint{font-size:.78rem;color:var(--dim);display:flex;justify-content:space-between}
+input[type=range]{width:100%;accent-color:var(--pink)}
+input[type=text],input[type=number],select,textarea{width:100%;background:var(--sky2);border:2px solid var(--line);border-radius:12px;padding:9px 11px}
+textarea{resize:vertical;min-height:70px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:480px){.row2{grid-template-columns:1fr}}
+.checks{display:grid;gap:6px;font-size:.88rem;background:#ffffff0d;border-radius:14px;padding:12px}
+.checks div{display:grid;grid-template-columns:22px 1fr;gap:6px}
+.checks .ok{color:var(--good)} .checks .tip{color:var(--yellow)}
+.hue{height:10px;border-radius:5px;background:linear-gradient(90deg,#f33,#fd3,#3f6,#3df,#36f,#c3f,#f33)}
+.dex-empty{color:var(--mute);border:3px dashed var(--line);border-radius:var(--r);padding:22px;text-align:center}
+.dexcard .x{background:none;border:0;color:var(--dim);cursor:pointer;font-size:.8rem}
+.dexcard .x:hover{color:var(--bad)}
+#confetti{position:fixed;inset:0;z-index:55;pointer-events:none}
+.helpbtn{margin-left:auto;flex:none}
+.bubble+.helpbtn{margin-left:0}
+.guide{width:min(560px,100%)!important;text-align:center;justify-items:center;padding:24px!important}
+.guide .mascot{width:96px;height:96px}
+.guide h3{font-size:1.45rem}
+.steps{display:grid;gap:10px;width:100%;text-align:left;margin:0;padding:0;list-style:none}
+.steps li{display:grid;grid-template-columns:40px 1fr;gap:12px;align-items:center;background:#ffffff10;border-radius:16px;padding:10px 14px}
+.steps .n{width:40px;height:40px;border-radius:50%;background:var(--yellow);color:#2b2250;display:grid;place-items:center;font-weight:900}
+.steps b{display:block}
+.steps small{color:var(--mute)}
+.guide .actions{justify-content:center}
+.namebox{display:grid;gap:6px;justify-items:center;width:min(320px,100%)}
+.namebox input{text-align:center;font-weight:800;font-size:1.05rem}
+.tag{background:#ffffff14;border-radius:999px;padding:6px 16px;font-weight:800}
+.toast{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--yellow);color:#2b2250;padding:10px 20px;border-radius:999px;font-weight:900;z-index:70;animation:pop-in .3s}
+footer{position:relative;z-index:1;color:var(--dim);font-size:.8rem;max-width:1140px;margin:0 auto;padding-inline:clamp(16px,3vw,28px);padding-block:0 40px}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<canvas id="stars" aria-hidden="true"></canvas>
+<canvas id="confetti" aria-hidden="true"></canvas>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="m-star" viewBox="0 0 120 120">
+      <path d="M60 8 L74 42 L111 45 L83 69 L92 106 L60 86 L28 106 L37 69 L9 45 L46 42 Z" fill="#ffd166" stroke="#ffb703" stroke-width="7" stroke-linejoin="round"/>
+      <circle cx="40" cy="71" r="6" fill="#ff8fc7" opacity=".75"/><circle cx="80" cy="71" r="6" fill="#ff8fc7" opacity=".75"/>
+    </symbol>
+    <symbol id="i-open" viewBox="0 0 60 60"><g fill="#7ef0d0"><circle cx="14" cy="18" r="4"/><circle cx="30" cy="12" r="3"/><circle cx="44" cy="20" r="5"/><circle cx="22" cy="32" r="3"/><circle cx="38" cy="34" r="4"/><circle cx="12" cy="44" r="3"/><circle cx="28" cy="48" r="5"/><circle cx="48" cy="46" r="3"/></g></symbol>
+    <symbol id="i-globular" viewBox="0 0 60 60"><defs><radialGradient id="gg"><stop offset="0" stop-color="#fff6d6"/><stop offset=".5" stop-color="#ffd166"/><stop offset="1" stop-color="#ffd16600"/></radialGradient></defs><circle cx="30" cy="30" r="26" fill="url(#gg)"/><g fill="#ffe7a8"><circle cx="18" cy="22" r="2"/><circle cx="42" cy="20" r="2"/><circle cx="14" cy="36" r="2"/><circle cx="46" cy="38" r="2"/><circle cx="30" cy="10" r="2"/><circle cx="30" cy="50" r="2"/><circle cx="22" cy="44" r="2"/><circle cx="40" cy="46" r="2"/></g></symbol>
+    <symbol id="i-emission" viewBox="0 0 60 60"><defs><radialGradient id="ge"><stop offset="0" stop-color="#ffd3dc"/><stop offset=".55" stop-color="#ff5a7e"/><stop offset="1" stop-color="#ff5a7e00"/></radialGradient></defs><path d="M10 38c-6-2-6-12 2-13 0-9 11-12 16-6 4-7 16-5 17 3 8 0 10 11 3 14 2 7-8 11-13 7-5 5-15 4-17-2-5 2-9-1-8-3z" fill="url(#ge)"/><path d="M30 24l2 5 5 1-4 3 1 5-4-3-4 3 1-5-4-3 5-1z" fill="#fff"/></symbol>
+    <symbol id="i-reflection" viewBox="0 0 60 60"><defs><radialGradient id="gr" cx=".35" cy=".35"><stop offset="0" stop-color="#e6f3ff"/><stop offset=".5" stop-color="#5aa8ff"/><stop offset="1" stop-color="#5aa8ff00"/></radialGradient></defs><path d="M8 40c-5-3-3-12 4-12 1-9 13-11 17-4 5-6 17-3 17 5 8 1 9 12 2 14 0 7-10 9-14 4-5 4-14 3-16-2-5 1-10-1-10-5z" fill="url(#gr)"/><circle cx="20" cy="20" r="6" fill="#fff"/><path d="M20 8v24M8 20h24" stroke="#fff" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-dark" viewBox="0 0 60 60"><g fill="#fff"><circle cx="8" cy="10" r="1.6"/><circle cx="20" cy="6" r="1.4"/><circle cx="34" cy="9" r="1.8"/><circle cx="50" cy="7" r="1.4"/><circle cx="54" cy="22" r="1.6"/><circle cx="6" cy="26" r="1.4"/><circle cx="10" cy="52" r="1.6"/><circle cx="52" cy="50" r="1.8"/><circle cx="30" cy="55" r="1.4"/></g><path d="M12 40c-5-4-2-13 5-12 2-9 13-10 17-3 6-5 16-1 15 7 6 2 6 11-1 12-1 6-10 8-14 3-5 4-14 2-15-3-5 0-8-2-7-4z" fill="#1a1530" stroke="#c2b2ec" stroke-width="2"/></symbol>
+  </defs>
+</svg>
+
+<div class="wrap">
+  <header class="top">
+    <svg class="mascot" id="mascotTop" viewBox="0 0 120 120" aria-hidden="true"><use href="#m-star"/><g class="eyes"><ellipse cx="49" cy="58" rx="5" ry="7" fill="#2b2250"/><ellipse cx="71" cy="58" rx="5" ry="7" fill="#2b2250"/><circle cx="51" cy="55" r="2" fill="#fff"/><circle cx="73" cy="55" r="2" fill="#fff"/></g><path class="mouth" d="M52 72 Q60 80 68 72" stroke="#2b2250" stroke-width="4" fill="none" stroke-linecap="round"/></svg>
+    <div class="brand">
+      <h1>성단·성운 <span>관측소</span></h1>
+      <p>중학교 2학년 과학 · 별과 우주 · NASA 진짜 우주 사진으로 배워요</p>
+    </div>
+    <p class="bubble" id="talk">안녕! 나는 별 친구 반짝이야. 같이 성단과 성운을 구분해 보자!</p>
+    <button class="btn helpbtn" id="helpBtn" type="button">사용법</button>
+  </header>
+</div>
+
+<nav class="tabs" aria-label="메뉴">
+  <div class="in" role="tablist">
+    <button role="tab" data-tab="learn" aria-selected="true">개념 익히기</button>
+    <button role="tab" data-tab="game" aria-selected="false">분류 게임</button>
+    <button role="tab" data-tab="gallery" aria-selected="false">NASA 사진 도감</button>
+    <button role="tab" data-tab="make" aria-selected="false">나만의 천체 만들기</button>
+  </div>
+</nav>
+
+<div class="wrap">
+
+<!-- ============ 개념 익히기 ============ -->
+<section class="page" id="tab-learn">
+  <div class="two">
+    <article class="card concept">
+      <span class="kicker">STAR CLUSTER</span>
+      <h2>성단 · 별들의 무리</h2>
+      <p class="def">많은 별이 <b>좁은 공간에 모여 무리</b>를 이룬 것이에요. 사진에서 <b>별 하나하나가 점</b>으로 보여요.</p>
+      <div class="duo">
+        <figure data-k="ao9"><div class="photo"></div><figcaption><span class="chip t-open"><span>산개성단</span></span>듬성듬성, 불규칙</figcaption></figure>
+        <figure data-k="ag7"><div class="photo"></div><figcaption><span class="chip t-globular"><span>구상성단</span></span>빽빽한 공 모양</figcaption></figure>
+      </div>
+    </article>
+    <article class="card concept">
+      <span class="kicker">NEBULA</span>
+      <h2>성운 · 가스와 먼지의 구름</h2>
+      <p class="def">별과 별 사이의 <b>가스와 티끌(성간 물질)</b>이 많이 모여 <b>구름처럼</b> 보이는 것이에요. 빛을 내는 방법에 따라 세 가지로 나눠요.</p>
+      <div class="duo">
+        <figure data-k="ae10"><div class="photo"></div><figcaption><span class="chip t-emission"><span>방출성운</span></span>스스로 빛나요</figcaption></figure>
+        <figure data-k="ad87"><div class="photo"></div><figcaption><span class="chip t-dark"><span>암흑성운</span></span>별빛을 가려요</figcaption></figure>
+      </div>
+    </article>
+  </div>
+
+  <div style="display:grid;gap:14px">
+    <h2>산개성단 vs 구상성단</h2>
+    <div class="tbl">
+      <table>
+        <thead><tr><th></th><th class="t-open">산개성단</th><th class="t-globular">구상성단</th></tr></thead>
+        <tbody>
+          <tr><th>별의 수</th><td>수십 ~ 수만 개</td><td>수만 ~ 수십만 개</td></tr>
+          <tr><th>모양</th><td>별이 듬성듬성, 불규칙하게 모여 있어요</td><td>별이 공 모양으로 빽빽하게 모여 있고, 중심으로 갈수록 더 빽빽해요</td></tr>
+          <tr><th>별의 색</th><td>파란색 (표면 온도가 높아요)</td><td>붉은색 (표면 온도가 낮아요)</td></tr>
+          <tr><th>별의 나이</th><td>젊은 별이 많아요</td><td>늙은 별이 많아요</td></tr>
+          <tr><th>우리은하 속 위치</th><td>주로 은하 원반 (나선팔)</td><td>주로 은하 중심부와 은하 원반을 둘러싼 구형 공간(헤일로)</td></tr>
+          <tr><th>예</th><td>플레이아데스 성단(M45), 벌집 성단(M44), 이중성단</td><td>헤라클레스자리 구상성단(M13), 오메가 센타우리</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div style="display:grid;gap:14px">
+    <h2>성운의 세 가지 종류</h2>
+    <div class="neb3">
+      <article class="card neb">
+        <div class="photo" data-k="messier-42"></div>
+        <h3 class="t-emission">방출성운</h3>
+        <p class="how">근처의 <b>뜨거운 별이 내는 에너지를 흡수</b>해서 가스가 <b>스스로 빛을 내요</b>. 주로 <b>붉은색</b>으로 보여요.</p>
+        <p class="ex">예: 오리온 대성운(M42), 석호 성운(M8), 장미 성운</p>
+      </article>
+      <article class="card neb">
+        <div class="photo" data-k="ar24"></div>
+        <h3 class="t-reflection">반사성운</h3>
+        <p class="how">스스로 빛을 내지 못하고 <b>주변 별빛을 반사</b>해서 보여요. 파란빛이 잘 반사되어 주로 <b>파란색</b>으로 보여요.</p>
+        <p class="ex">예: 아이리스 성운, 마녀머리 성운, 플레이아데스 성단 주변의 성운</p>
+      </article>
+      <article class="card neb">
+        <div class="photo" data-k="ad14"></div>
+        <h3 class="t-dark">암흑성운</h3>
+        <p class="how">가스와 먼지가 빽빽하게 모여서 <b>뒤쪽에서 오는 별빛을 가려</b> <b>검게</b> 보여요.</p>
+        <p class="ex">예: 말머리 성운(오리온자리), 바너드 68, 파이프 성운</p>
+      </article>
+    </div>
+  </div>
+
+  <div style="display:grid;gap:14px">
+    <h2>사진을 보고 구분하는 순서</h2>
+    <div class="path">
+      <div class="stone"><span class="q">1</span><div>사진 속에 <b>별이 점으로 모여</b> 있나요, <b>구름 같은 가스</b>가 퍼져 있나요?
+        <div class="ans"><span>점이 모여 있다 → <b>성단</b> (2번으로)</span><span>구름이 퍼져 있다 → <b>성운</b> (3번으로)</span></div></div></div>
+      <div class="stone"><span class="q">2</span><div>별이 <b>공 모양으로 빽빽</b>하고 가운데가 아주 밝나요?
+        <div class="ans"><span>예 → <b class="t-globular">구상성단</b></span><span>아니요, 듬성듬성 → <b class="t-open">산개성단</b></span></div></div></div>
+      <div class="stone"><span class="q">3</span><div>구름이 <b>빛나고</b> 있나요, 뒤쪽 별을 <b>가리고</b> 있나요?
+        <div class="ans"><span>검게 가린다 → <b class="t-dark">암흑성운</b></span><span>빛난다 → 4번으로</span></div></div></div>
+      <div class="stone"><span class="q">4</span><div>구름이 무슨 색인가요?
+        <div class="ans"><span>붉은색 → <b class="t-emission">방출성운</b></span><span>파란색 → <b class="t-reflection">반사성운</b></span></div></div></div>
+    </div>
+    <div><button class="btn yellow" data-go="game">분류 게임 하러 가기</button></div>
+  </div>
+</section>
+
+<!-- ============ 분류 게임 ============ -->
+<section class="page" id="tab-game" hidden>
+  <div class="game" id="game"></div>
+</section>
+
+<!-- ============ 사진 도감 ============ -->
+<section class="page" id="tab-gallery" hidden>
+  <div style="display:grid;gap:8px">
+    <h2>NASA 사진 도감</h2>
+    <p class="lead">NASA 허블 우주 망원경과 NASA <b>오늘의 천문 사진(APOD)</b>에서 가져온 진짜 우주 사진 <b id="gCount"></b>장이에요. <b>이름 가리기</b>를 켜고 먼저 맞혀 본 다음, 사진을 눌러 정답을 확인해요.</p>
+  </div>
+  <div class="toolbar">
+    <div class="filters" id="gFilters"></div>
+    <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:center">
+      <label class="switch"><input type="checkbox" id="gHide"> 이름 가리기</label>
+      <button class="btn" id="gShuffle">섞기</button>
+    </div>
+  </div>
+  <div class="grid" id="gGrid"></div>
+</section>
+
+<!-- ============ 나만의 천체 ============ -->
+<section class="page" id="tab-make" hidden>
+  <div style="display:grid;gap:8px">
+    <h2>나만의 천체 만들기</h2>
+    <p class="lead">천체의 종류를 고르고 별의 수, 색, 가스의 양을 바꿔서 나만의 성단이나 성운을 만들어요. <b>반짝이 검사관</b>이 진짜 천체의 특징과 맞는지 알려 줘요. 다 만들면 이름을 지어 <b>천체 카드</b>로 저장해요.</p>
+  </div>
+  <div class="maker">
+    <div class="view">
+      <canvas class="sky" id="mCanvas" width="480" height="480"></canvas>
+      <div class="actions">
+        <button class="btn" id="mDice">모양 바꾸기</button>
+        <button class="btn yellow" id="mCard">천체 카드 만들기</button>
+        <button class="btn pink" id="mSave">내 도감에 추가</button>
+      </div>
+    </div>
+    <div class="card panel">
+      <div class="field"><span class="lab">1. 천체의 종류</span><div class="types" id="mTypes"></div></div>
+      <div class="field" id="fStars"><label for="mStars">별의 수 <span class="v" id="vStars"></span></label><input type="range" id="mStars" min="0" max="100" value="50"></div>
+      <div class="field" id="fSpread"><label for="mSpread">크기·퍼짐 정도 <span class="v" id="vSpread"></span></label><input type="range" id="mSpread" min="0" max="100" value="50"></div>
+      <div class="field" id="fTemp"><label for="mTemp">별의 색 (표면 온도) <span class="v" id="vTemp"></span></label><input type="range" id="mTemp" min="0" max="100" value="50"><div class="hint"><span>붉은색 · 늙은 별</span><span>파란색 · 젊은 별</span></div></div>
+      <div class="field" id="fGas"><label for="mGas">가스·먼지의 양 <span class="v" id="vGas"></span></label><input type="range" id="mGas" min="0" max="100" value="50"></div>
+      <div class="field" id="fHue"><label for="mHue">성운의 색 <span class="v" id="vHue"></span></label><input type="range" id="mHue" min="0" max="359" value="355"><div class="hue"></div></div>
+      <div class="field"><span class="lab">반짝이 검사관</span><div class="checks" id="mChecks"></div></div>
+      <div class="field"><label for="mName">2. 천체의 이름</label><input type="text" id="mName" maxlength="20" value="붉은 장미 성운"></div>
+      <div class="row2">
+        <div class="field"><label for="mConst">보이는 별자리</label><select id="mConst"></select></div>
+        <div class="field"><label for="mDist">지구에서의 거리 (광년)</label><input type="number" id="mDist" min="1" max="10000000" value="4500"></div>
+      </div>
+      <div class="field"><label for="mDesc">소개</label><textarea id="mDesc" maxlength="140">가운데 있는 뜨겁고 젊은 별들이 내는 에너지를 받아 수소 가스가 붉게 빛나는 방출성운이다.</textarea></div>
+      <div class="field"><label for="mMaker">발견자 (만든 사람)</label><input type="text" id="mMaker" maxlength="20" placeholder="예: 2학년 3반 김별"></div>
+    </div>
+  </div>
+  <div style="display:grid;gap:14px">
+    <div class="toolbar"><h2>내 천체 도감</h2><span class="lead" id="dexCount"></span></div>
+    <div class="grid" id="dexGrid"></div>
+  </div>
+</section>
+</div>
+
+<footer>
+  사진 출처: NASA 허블 메시에·칼드웰 천체 목록(NASA, ESA, Hubble), NASA 오늘의 천문 사진(APOD, apod.nasa.gov). APOD 사진의 저작권은 사진마다 적힌 촬영자에게 있어요. 사진은 NASA 누리집에서 바로 불러오므로 인터넷이 연결되어 있어야 해요. 나만의 천체 만들기의 그림은 컴퓨터가 그린 것이에요.
+</footer>
+
+<div class="modal" id="guide" hidden>
+  <div class="box guide" role="dialog" aria-modal="true" aria-labelledby="gdTitle">
+    <svg class="mascot" viewBox="0 0 120 120" aria-hidden="true"><use href="#m-star"/><g class="eyes"><ellipse cx="49" cy="58" rx="5" ry="7" fill="#2b2250"/><ellipse cx="71" cy="58" rx="5" ry="7" fill="#2b2250"/><circle cx="51" cy="55" r="2" fill="#fff"/><circle cx="73" cy="55" r="2" fill="#fff"/></g><path d="M48 70 Q60 88 72 70 Z" fill="#2b2250" stroke="#2b2250" stroke-width="4" stroke-linejoin="round"/></svg>
+    <h3 id="gdTitle">반가워! 성단·성운 관측소야</h3>
+    <p class="lead">위쪽 메뉴 버튼을 눌러서 차례대로 해 봐요.</p>
+    <ol class="steps">
+      <li><span class="n">1</span><div><b>개념 익히기</b><small>성단 2가지, 성운 3가지를 NASA 사진으로 배워요.</small></div></li>
+      <li><span class="n">2</span><div><b>분류 게임</b><small>사진을 보고 알맞은 상자를 골라요. 결과 화면을 캡처해서 선생님께 보내요.</small></div></li>
+      <li><span class="n">3</span><div><b>NASA 사진 도감</b><small>진짜 우주 사진 89장을 이름을 가리고 맞혀 봐요.</small></div></li>
+      <li><span class="n">4</span><div><b>나만의 천체 만들기</b><small>나만의 성단이나 성운을 만들고 천체 카드를 저장해요.</small></div></li>
+    </ol>
+    <div class="actions">
+      <button class="btn" id="gdLearn" type="button">개념부터 볼래요</button>
+      <button class="btn yellow" id="gdGame" type="button">게임 바로 하기</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="modal" hidden>
+  <div class="box" role="dialog" aria-modal="true" aria-labelledby="mdTitle">
+    <img class="big" id="mdImg" alt="">
+    <div class="info">
+      <div id="mdChip"></div>
+      <h3 id="mdTitle"></h3>
+      <p id="mdNote"></p>
+      <p class="src" id="mdSrc"></p>
+    </div>
+    <div class="actions">
+      <a class="btn" id="mdLink" target="_blank" rel="noopener">NASA 누리집에서 보기</a>
+      <button class="btn yellow" id="mdDl" hidden>PNG로 저장</button>
+      <button class="btn pink" id="mdClose">닫기</button>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+const PHOTOS = [{"k":"ao0","t":"open","name":"플레이아데스 성단 (M45)","note":"황소자리에 있는 유명한 산개성단이에요. 별 주변의 파란 안개는 별빛을 반사하는 반사성운이에요.","img":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2026/february/Pleiades_Fiedosiuk_2200.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg","th":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2026/february/Pleiades_Fiedosiuk_2200.jpg/jcr:content/renditions/cq5dam.thumbnail.319.319.png","by":"Kamil Fiedosiuk","src":"https://science.nasa.gov/image-article/apod-2026-february-23-pleiades-the-seven-sisters-star-cluster/","from":"APOD","learn":1},{"k":"ao9","t":"open","name":"페르세우스자리 이중성단","note":"산개성단 두 개가 나란히 붙어 있어요.","img":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2025/august/DoubleClusterBrechersmall.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg","th":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2025/august/DoubleClusterBrechersmall.jpg/jcr:content/renditions/cq5dam.thumbnail.319.319.png","by":"Ron Brecher","src":"https://science.nasa.gov/image-article/apod-2025-august-7-the-double-cluster-in-perseus/","from":"APOD"},{"k":"ao18","t":"open","name":"작은 벌집 성단 (M41)","note":"","img":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2025/february/M41_Li_4000.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg","th":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2025/february/M41_Li_4000.jpg/jcr:content/renditions/cq5dam.thumbnail.319.319.png","by":"Xinran Li","src":"https://science.nasa.gov/image-article/apod-2025-february-25-m41-the-little-beehive-star-cluster/","from":"APOD"},{"k":"ao19","t":"open","name":"벌집 성단 (M44, 프레세페)","note":"게자리에 있어 맨눈으로도 뿌옇게 보여요.","img":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2022/april/M44-resized.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg","th":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2022/april/M44-resized.jpg/jcr:content/renditions/cq5dam.thumbnail.319.319.png","by":"Drew Evans","src":"https://science.nasa.gov/image-article/apod-2022-april-30-m44-the-beehive-cluster/","from":"APOD"},{"k":"ao22","t":"open","name":"벌집 성단 (M44, 프레세페)","note":"","img":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2014/february/m44franke1600.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg","th":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2014/february/m44franke1600.jpg/jcr:content/renditions/cq5dam.thumbnail.319.319.png","by":"Bob Franke","src":"https://science.nasa.gov/image-article/apod-2014-february-22-m44-the-beehive-cluster/","from":"APOD"},{"k":"ao24","t":"open","name":"M35 산개성단","note":"오른쪽 아래의 작고 노란 무리는 더 멀리 있는 다른 성단(NGC 2158)이에요.","img":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2025/february/M35_NGC2158_2048.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg","th":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2025/february/M35_NGC2158_2048.jpg/jcr:content/renditions/cq5dam.thumbnail.319.319.png","by":"Evan Tsai, LATTE: Lulin-ASIAA Telescope","src":"https://science.nasa.gov/image-article/apod-2025-february-27-open-star-clusters-m35-and-ngc-2158/","from":"APOD"},{"k":"ao25","t":"open","name":"캐롤라인의 장미 성단 (NGC 7789)","note":"","img":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2024/july/NGC7789_difusco2048.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg","th":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2024/july/NGC7789_difusco2048.jpg/jcr:content/renditions/cq5dam.thumbnail.319.319.png","by":"Massimo Di Fusco","src":"https://science.nasa.gov/image-article/apod-2024-july-6-ngc-7789-caroline-s-rose/","from":"APOD"},{"k":"ao30","t":"open","name":"M38 산개성단","note":"","img":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2003/january/m38_noao_big.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg","th":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2003/january/m38_noao_big.jpg/jcr:content/renditions/cq5dam.thumbnail.319.319.png","by":"","src":"https://science.nasa.gov/image-article/apod-2003-january-7-open-star-cluster-m38/","from":"APOD"},{"k":"ao33","t":"open","name":"M7 산개성단 (전갈자리)","note":"","img":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2012/september/m7_willasch_2200.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg","th":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2012/september/m7_willasch_2200.jpg/jcr:content/renditions/cq5dam.thumbnail.319.319.png","by":"Dieter Willasch ( Astro-Cabinet )","src":"https://science.nasa.gov/image-article/apod-2012-september-12-m7-open-star-cluster-in-scorpius/","from":"APOD"},{"k":"ao39","t":"open","name":"보석 상자 성단 (NGC 290)","note":"허블 우주 망원경이 찍은 사진이에요.","img":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2019/october/Ngc290_HubbleOlszewski_1701.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg","th":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2019/october/Ngc290_HubbleOlszewski_1701.jpg/jcr:content/renditions/cq5dam.thumbnail.319.319.png","by":"NASA, ESA, Hubble ; Acknowledgement: E. Olzewski (U. Arizona)","src":"https://science.nasa.gov/image-article/apod-2019-october-13-a-stellar-jewel-box-open-cluster-ngc-290/","from":"APOD"},{"k":"ao41","t":"open","name":"보석 상자 성단 (NGC 4755)","note":"","img":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2010/august/jewelbox_willasch_big.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg","th":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2010/august/jewelbox_willasch_big.jpg/jcr:content/renditions/cq5dam.thumbnail.319.319.png","by":"","src":"https://science.nasa.gov/image-article/apod-2010-august-17-ngc-4755-a-jewel-box-of-stars/","from":"APOD"},{"k":"ao45","t":"open","name":"캐롤라인의 장미 성단 (NGC 7789)","note":"","img":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2017/november/NGC7789Rose_Seigneuret2048.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg","th":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2017/november/NGC7789Rose_Seigneuret2048.jpg/jcr:content/renditions/cq5dam.thumbnail.319.319.png","by":"Guillaume Seigneuret","src":"https://science.nasa.gov/image-article/apod-2017-november-15-ngc-7789-carolines-rose/","from":"APOD"},{"k":"ao48","t":"open","name":"들오리 성단 (M11)","note":"밝은 별들이 날아가는 오리 떼처럼 V자로 보여요.","img":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2003/january/m11_cfht_big.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg","th":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2003/january/m11_cfht_big.jpg/jcr:content/renditions/cq5dam.thumbnail.319.319.png","by":"","src":"https://science.nasa.gov/image-article/apod-2003-january-22-m11-the-wild-duck-cluster/","from":"APOD"},{"k":"ao53","t":"open","name":"M103 산개성단","note":"","img":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2001/february/m103_kpno_big.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg","th":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2001/february/m103_kpno_big.jpg/jcr:content/renditions/cq5dam.thumbnail.319.319.png","by":"","src":"https://science.nasa.gov/image-article/apod-2001-february-7-distant-open-cluster-m103/","from":"APOD"},{"k":"ao54","t":"open","name":"M46과 M47 산개성단","note":"산개성단 두 개가 한 사진에 담겼어요.","img":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2012/april/m46m47_equivar_1600.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg","th":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2012/april/m46m47_equivar_1600.jpg/jcr:content/renditions/cq5dam.thumbnail.319.319.png","by":"Sergio Eguivar ( Buenos Aires Skies )","src":"https://science.nasa.gov/image-article/apod-2012-april-3-m46-and-m47-star-clusters-young-and-old/","from":"APOD"},{"k":"ag7","t":"globular","name":"헤라클레스자리 구상성단 (M13)","note":"1974년 이 성단을 향해 외계인에게 보내는 전파 메시지를 쏘았어요.","img":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2025/august/lrg_ngc6205.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg","th":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2025/august/lrg_ngc6205.jpg/jcr:content/renditions/cq5dam.thumbnail.319.319.png","by":"R. Jay Gabany","src":"https://science.nasa.gov/image-article/apod-2025-august-14-m13-the-great-globular-cluster-in-hercules/","from":"APOD"},{"k":"ag8","t":"globular","name":"큰부리새자리 47 구상성단","note":"남반구 하늘에서 맨눈으로 보이는 큰 구상성단이에요.","img":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2025/september/crtastro_0352.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg","th":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2025/september/crtastro_0352.jpg/jcr:content/renditions/cq5dam.thumbnail.319.319.png","by":"Carlos Taylor","src":"https://science.nasa.gov/image-article/apod-2025-september-5-47-tucanae-globular-star-cluster/","from":"APOD"},{"k":"ag10","t":"globular","name":"오메가 센타우리","note":"별이 약 1000만 개나 모인, 우리은하에서 가장 큰 구상성단이에요.","img":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2025/july/oc_ls_2025.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg","th":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2025/july/oc_ls_2025.jpg/jcr:content/renditions/cq5dam.thumbnail.319.319.png","by":"Data acquisition - SkyFlux Team, Processing - Leo Shatz","src":"https://science.nasa.gov/image-article/apod-2025-july-26-globular-cluster-omega-centauri/","from":"APOD"},{"k":"ag16","t":"globular","name":"NGC 6752 구상성단","note":"","img":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2024/october/NGC6752_DiFusco.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg","th":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2024/october/NGC6752_DiFusco.jpg/jcr:content/renditions/cq5dam.thumbnail.319.319.png","by":"Massimo Di Fusco, Aygen Erkaslan","src":"https://science.nasa.gov/image-article/apod-2024-october-25-globular-star-cluster-ngc-6752/","from":"APOD"},{"k":"ag28","t":"globular","name":"헤라클레스자리 구상성단 (M13)","note":"","img":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2012/june/M13LRGBv1_pugh.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg","th":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2012/june/M13LRGBv1_pugh.jpg/jcr:content/renditions/cq5dam.thumbnail.319.319.png","by":"Martin Pugh","src":"https://science.nasa.gov/image-article/apod-2012-june-14-m13-the-great-globular-cluster-in-hercules/","from":"APOD"},{"k":"ag41","t":"globular","name":"오메가 센타우리","note":"","img":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2016/april/OmegaCen_Colombari_1833.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg","th":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2016/april/OmegaCen_Colombari_1833.jpg/jcr:content/renditions/cq5dam.thumbnail.319.319.png","by":"Roberto Colombari","src":"https://science.nasa.gov/image-article/apod-2016-april-27-omega-centauri-the-brightest-globular-star-cluster/","from":"APOD"},{"k":"ag61","t":"globular","name":"M22 구상성단","note":"","img":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2018/april/mars_saturn_m22_2018_03_31dp.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg","th":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2018/april/mars_saturn_m22_2018_03_31dp.jpg/jcr:content/renditions/cq5dam.thumbnail.319.319.png","by":"Damian Peach","src":"https://science.nasa.gov/image-article/apod-2018-april-12-m22-and-the-wanderers/","from":"APOD"},{"k":"ag70","t":"globular","name":"M15 구상성단","note":"","img":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2018/october/M015-2_Hubl.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg","th":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2018/october/M015-2_Hubl.jpg/jcr:content/renditions/cq5dam.thumbnail.319.319.png","by":"Bernhard Hubl ( CEDIC )","src":"https://science.nasa.gov/image-article/apod-2018-october-17-m15-dense-globular-star-cluster/","from":"APOD"},{"k":"ag75","t":"globular","name":"M4 구상성단","note":"지구에서 가장 가까운 구상성단 중 하나예요.","img":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2000/may/m4_noao_big.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg","th":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2000/may/m4_noao_big.jpg/jcr:content/renditions/cq5dam.thumbnail.319.319.png","by":"","src":"https://science.nasa.gov/image-article/apod-2000-may-23-m4-the-closest-known-globular-cluster/","from":"APOD"},{"k":"ae0","t":"emission","name":"캘리포니아 성운 (NGC 1499)","note":"미국 캘리포니아주 모양을 닮았어요.","img":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2025/march/California_Mendez_2604.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg","th":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2025/march/California_Mendez_2604.jpg/jcr:content/renditions/cq5dam.thumbnail.319.319.png","by":"Toni Fabiani Mendez","src":"https://science.nasa.gov/image-article/apod-2025-march-10-ngc-1499-the-california-nebula/","from":"APOD"},{"k":"ae3","t":"emission","name":"하트 성운 (IC 1805)","note":"하트 모양을 닮은 방출성운이에요.","img":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2025/october/IC1805_Mendez_6281.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg","th":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2025/october/IC1805_Mendez_6281.jpg/jcr:content/renditions/cq5dam.thumbnail.319.319.png","by":"Toni Fabiani","src":"https://science.nasa.gov/image-article/apod-2025-october-21-ic-1805-the-heart-nebula/","from":"APOD"},{"k":"ae9","t":"emission","name":"소울 성운 (W5)","note":"","img":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2025/december/Soul_Horne_2048.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg","th":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2025/december/Soul_Horne_2048.jpg/jcr:content/renditions/cq5dam.thumbnail.319.319.png","by":"Jeffrey Horne","src":"https://science.nasa.gov/image-article/apod-2025-december-17-w5-the-soul-nebula/","from":"APOD"},{"k":"ae10","t":"emission","name":"장미 성운","note":"가운데 뜨거운 별들이 가스를 빛나게 해요.","img":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2025/june/RosettaDeepRed_Mendez_3294.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg","th":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2025/june/RosettaDeepRed_Mendez_3294.jpg/jcr:content/renditions/cq5dam.thumbnail.319.319.png","by":"Toni Fabiani Méndez","src":"https://science.nasa.gov/image-article/apod-2025-june-17-rosette-nebula-deep-field/","from":"APOD"},{"k":"ae12","t":"emission","name":"올챙이 성운 (IC 410)","note":"올챙이처럼 생긴 가스 덩어리가 숨어 있어요.","img":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2022/december/Tadpoles_Stocks_960.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg","th":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2022/december/Tadpoles_Stocks_960.jpg/jcr:content/renditions/cq5dam.thumbnail.319.319.png","by":"Craig Stocks (Utah Desert Remote Observatories)","src":"https://science.nasa.gov/image-article/apod-2022-december-19-the-tadpole-nebula-in-gas-and-dust/","from":"APOD"},{"k":"ae19","t":"emission","name":"장미 성운","note":"","img":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2019/april/JMD_Rosette_Rotated.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg","th":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2019/april/JMD_Rosette_Rotated.jpg/jcr:content/renditions/cq5dam.thumbnail.319.319.png","by":"Jean Dean","src":"https://science.nasa.gov/image-article/apod-2019-april-12-a-cosmic-rose-the-rosette-nebula-in-monoceros/","from":"APOD"},{"k":"ae51","t":"emission","name":"북아메리카 성운","note":"북아메리카 대륙 모양을 닮았어요.","img":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2025/january/NGC7000_Valianos_3132.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg","th":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2025/january/NGC7000_Valianos_3132.jpg/jcr:content/renditions/cq5dam.thumbnail.319.319.png","by":"Dimitris Valianos","src":"https://science.nasa.gov/image-article/apod-2025-january-22-the-north-america-nebula/","from":"APOD"},{"k":"ae62","t":"emission","name":"석호 성운 (M8)","note":"","img":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2023/september/M8-Mos-SL10-DCPrgb-st-154-cC-cr.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg","th":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2023/september/M8-Mos-SL10-DCPrgb-st-154-cC-cr.jpg/jcr:content/renditions/cq5dam.thumbnail.319.319.png","by":"Josep Drudis, Christian Sasse","src":"https://science.nasa.gov/image-article/apod-2023-september-28-the-deep-lagoon/","from":"APOD"},{"k":"ae75","t":"emission","name":"석호 성운 (M8)","note":"궁수자리에 있어 여름철에 볼 수 있어요.","img":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2016/september/M8-8-25-16-webMillerWalker2048.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg","th":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2016/september/M8-8-25-16-webMillerWalker2048.jpg/jcr:content/renditions/cq5dam.thumbnail.319.319.png","by":"Michael Miller, Jimmy Walker","src":"https://science.nasa.gov/image-article/apod-2016-september-9-the-wide-and-deep-lagoon/","from":"APOD"},{"k":"ae77","t":"emission","name":"용골자리 대성운","note":"","img":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2024/april/NGC3372_ETA_CARINA_LOPES.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg","th":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2024/april/NGC3372_ETA_CARINA_LOPES.jpg/jcr:content/renditions/cq5dam.thumbnail.319.319.png","by":"Demison Lopes","src":"https://science.nasa.gov/image-article/apod-2024-april-19-the-great-carina-nebula/","from":"APOD"},{"k":"ae87","t":"emission","name":"독수리 성운 (M16)","note":"가운데에 유명한 '창조의 기둥'이 있어요.","img":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2019/november/M16_HaSynLumLumRGB.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg","th":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2019/november/M16_HaSynLumLumRGB.jpg/jcr:content/renditions/cq5dam.thumbnail.319.319.png","by":"Martin Pugh","src":"https://science.nasa.gov/image-article/apod-2019-november-15-m16-and-the-eagle-nebula/","from":"APOD"},{"k":"ar24","t":"reflection","name":"아이리스 성운 (NGC 7023)","note":"꽃처럼 생긴 반사성운이에요.","img":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2026/january/NGC7023_Falk2048.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg","th":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2026/january/NGC7023_Falk2048.jpg/jcr:content/renditions/cq5dam.thumbnail.319.319.png","by":"Justus Falk","src":"https://science.nasa.gov/image-article/apod-2026-january-16-ngc-7023-the-iris-nebula/","from":"APOD"},{"k":"ar31","t":"reflection","name":"푸른 말머리 성운 (IC 4592)","note":"","img":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2023/september/BlueHorse_Grelin_9342.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg","th":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2023/september/BlueHorse_Grelin_9342.jpg/jcr:content/renditions/cq5dam.thumbnail.319.319.png","by":"Antoine & Dalia Grelin","src":"https://science.nasa.gov/image-article/apod-2023-september-26-ic-4592-the-blue-horsehead-reflection-nebula/","from":"APOD"},{"k":"ar33","t":"reflection","name":"아이리스 성운 (NGC 7023)","note":"","img":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2023/september/268_lorand_fenyes_iris_ngc7023.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg","th":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2023/september/268_lorand_fenyes_iris_ngc7023.jpg/jcr:content/renditions/cq5dam.thumbnail.319.319.png","by":"Lorand Fenyes","src":"https://science.nasa.gov/image-article/apod-2023-september-2-ngc-7023-the-iris-nebula/","from":"APOD"},{"k":"ar37","t":"reflection","name":"아이리스 성운 (NGC 7023)","note":"주변의 갈색 먼지 구름은 빛을 가리는 암흑성운이에요.","img":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2018/august/IrisNebula_Sgueglia_2729.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg","th":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2018/august/IrisNebula_Sgueglia_2729.jpg/jcr:content/renditions/cq5dam.thumbnail.319.319.png","by":"Franco Sgueglia & Francesco Sferlazza","src":"https://science.nasa.gov/image-article/apod-2018-august-1-the-iris-nebula-in-a-field-of-dust/","from":"APOD"},{"k":"ar54","t":"reflection","name":"반사성운 vdB 1","note":"","img":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2012/october/vdb1Blockc.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg","th":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2012/october/vdb1Blockc.jpg/jcr:content/renditions/cq5dam.thumbnail.319.319.png","by":"Adam Block, Mt. Lemmon SkyCenter, University of Arizona","src":"https://science.nasa.gov/image-article/apod-2012-october-26-reflection-nebula-vdb1/","from":"APOD"},{"k":"ar59","t":"reflection","name":"리겔과 마녀머리 성운","note":"오리온자리의 밝은 별 리겔의 빛을 반사해요.","img":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2018/january/Witchhead_Cogo_1024.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg","th":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2018/january/Witchhead_Cogo_1024.jpg/jcr:content/renditions/cq5dam.thumbnail.319.319.png","by":"Mario Cogo ( Galax Lux )","src":"https://science.nasa.gov/image-article/apod-2018-january-15-rigel-and-the-witch-head-nebula/","from":"APOD"},{"k":"ar60","t":"reflection","name":"마녀머리 성운 (IC 2118)","note":"마녀의 옆얼굴을 닮았어요.","img":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2015/october/IC2118_A_full.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg","th":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2015/october/IC2118_A_full.jpg/jcr:content/renditions/cq5dam.thumbnail.319.319.png","by":"Jeff Signorelli","src":"https://science.nasa.gov/image-article/apod-2015-october-30-the-witch-head-nebula/","from":"APOD"},{"k":"ar75","t":"reflection","name":"M78 반사성운","note":"","img":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2014/march/m78_sharp_1971.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg","th":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2014/march/m78_sharp_1971.jpg/jcr:content/renditions/cq5dam.thumbnail.319.319.png","by":"Ian Sharp","src":"https://science.nasa.gov/image-article/apod-2014-march-26-m78-and-reflecting-dust-clouds/","from":"APOD"},{"k":"ar83","t":"reflection","name":"M78 반사성운","note":"","img":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2002/february/m78_aao_big.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg","th":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2002/february/m78_aao_big.jpg/jcr:content/renditions/cq5dam.thumbnail.319.319.png","by":"","src":"https://science.nasa.gov/image-article/apod-2002-february-11-reflection-nebula-m78/","from":"APOD"},{"k":"ar103","t":"reflection","name":"메로페 반사성운","note":"플레이아데스 성단의 별 메로페 주변에 있어요.","img":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2012/february/merope_orazi_2023.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg","th":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2012/february/merope_orazi_2023.jpg/jcr:content/renditions/cq5dam.thumbnail.319.319.png","by":"Leonardo Orazi","src":"https://science.nasa.gov/image-article/apod-2012-february-15-meropes-reflection-nebula/","from":"APOD"},{"k":"ar104","t":"reflection","name":"메로페 반사성운","note":"","img":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2007/june/merope_cfht_big.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg","th":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2007/june/merope_cfht_big.jpg/jcr:content/renditions/cq5dam.thumbnail.319.319.png","by":"","src":"https://science.nasa.gov/image-article/apod-2007-june-11-the-merope-reflection-nebula/","from":"APOD"},{"k":"ar113","t":"reflection","name":"NGC 1999 반사성운","note":"가운데 검은 부분은 구멍처럼 비어 있는 곳이에요.","img":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2000/march/ngc1999_hst_big.jpg","th":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2000/march/ngc1999_hst_big.jpg","by":"","src":"https://science.nasa.gov/image-article/apod-2000-march-2-ngc-1999-reflection-nebula-in-orion/","from":"APOD"},{"k":"ad6","t":"dark","name":"다크 두대드 성운","note":"가늘고 긴 암흑성운이에요.","img":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2024/june/Doodad_PughSung_9193.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg","th":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2024/june/Doodad_PughSung_9193.jpg/jcr:content/renditions/cq5dam.thumbnail.319.319.png","by":"Martin Pugh & Rocco Sung","src":"https://science.nasa.gov/image-article/apod-2024-june-25-the-dark-doodad-nebula/","from":"APOD"},{"k":"ad14","t":"dark","name":"말머리 성운","note":"붉은 방출성운 앞을 말 머리 모양의 먼지가 가리고 있어요.","img":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2025/december/IC434NM.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg","th":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2025/december/IC434NM.jpg/jcr:content/renditions/cq5dam.thumbnail.319.319.png","by":"George Chatzifrantzis","src":"https://science.nasa.gov/image-article/apod-2025-december-10-the-horsehead-nebula/","from":"APOD"},{"k":"ad16","t":"dark","name":"작은 암흑성운","note":"","img":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2025/august/BokGlobule_1.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg","th":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2025/august/BokGlobule_1.jpg/jcr:content/renditions/cq5dam.thumbnail.319.319.png","by":"Peter Bresseler","src":"https://science.nasa.gov/image-article/apod-2025-august-1-small-dark-nebula/","from":"APOD"},{"k":"ad46","t":"dark","name":"우주 박쥐 성운 (LDN 43)","note":"","img":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2024/october/LDN43_SelbyHanson_3993.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg","th":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2024/october/LDN43_SelbyHanson_3993.jpg/jcr:content/renditions/cq5dam.thumbnail.319.319.png","by":"","src":"https://science.nasa.gov/image-article/apod-2024-october-27-ldn-43-the-cosmic-bat-nebula/","from":"APOD"},{"k":"ad56","t":"dark","name":"말머리 성운","note":"","img":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2015/may/Horsehead_Colombari_2035.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg","th":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2015/may/Horsehead_Colombari_2035.jpg/jcr:content/renditions/cq5dam.thumbnail.319.319.png","by":"Data: Giuseppe Carmine Iaffaldano; Processing: Roberto Colombari","src":"https://science.nasa.gov/image-article/apod-2015-may-13-the-magnificent-horsehead-nebula/","from":"APOD"},{"k":"ad60","t":"dark","name":"유령 암흑성운 (B93)","note":"","img":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2026/february/B93_bertincourt_1178.png/jcr:content/renditions/cq5dam.web.1280.1280.png","th":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2026/february/B93_bertincourt_1178.png/jcr:content/renditions/cq5dam.web.1280.1280.png","by":"Christian Bertincourt","src":"https://science.nasa.gov/image-article/apod-2026-february-20-b93-a-dark-interstellar-ghost/","from":"APOD"},{"k":"ad63","t":"dark","name":"기린 성운 (LDN 1295)","note":"","img":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2026/september/LDN1295_giraffe.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg","th":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2026/september/LDN1295_giraffe.jpg/jcr:content/renditions/cq5dam.thumbnail.319.319.png","by":"","src":"https://science.nasa.gov/image-article/apod-2026-september-10-ldn-1295-the-giraffe-nebula/","from":"APOD"},{"k":"ad65","t":"dark","name":"암흑성운 LDN 1251","note":"","img":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2025/july/LDN1251gualco2048.JPG/jcr:content/renditions/cq5dam.web.1280.1280.jpeg","th":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2025/july/LDN1251gualco2048.JPG/jcr:content/renditions/cq5dam.thumbnail.319.319.png","by":"Cristiano Gualco","src":"https://science.nasa.gov/image-article/apod-2025-july-10-lynds-dark-nebula-1251/","from":"APOD"},{"k":"ad66","t":"dark","name":"카멜레온자리 암흑성운","note":"","img":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2025/november/Chamaeleon_Houbo_960.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg","th":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2025/november/Chamaeleon_Houbo_960.jpg/jcr:content/renditions/cq5dam.thumbnail.319.319.png","by":"Xinran Li & Houbo Zhao","src":"https://science.nasa.gov/image-article/apod-2025-november-19-chamaeleon-dark-nebulas/","from":"APOD"},{"k":"ad67","t":"dark","name":"세페우스자리 해마 성운","note":"해마 모양을 닮은 암흑성운이에요.","img":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2025/november/B150Seahorse.png/jcr:content/renditions/cq5dam.web.1280.1280.png","th":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2025/november/B150Seahorse.png/jcr:content/renditions/cq5dam.web.1280.1280.png","by":"Jordi Jofre","src":"https://science.nasa.gov/image-article/apod-2025-november-7-a-dark-seahorse-in-cepheus/","from":"APOD"},{"k":"ad82","t":"dark","name":"암흑성운 LDN 988","note":"","img":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2015/september/LDN988andCompany_morales2048.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg","th":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2015/september/LDN988andCompany_morales2048.jpg/jcr:content/renditions/cq5dam.thumbnail.319.319.png","by":"Rafael Rodríguez Morales","src":"https://science.nasa.gov/image-article/apod-2015-september-24-ldn-988-and-friends/","from":"APOD"},{"k":"ad87","t":"dark","name":"바너드 68","note":"가스와 먼지가 아주 빽빽해서 뒤쪽 별빛을 완전히 가려요.","img":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2023/january/barnard68v2_vlt_4000.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg","th":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2023/january/barnard68v2_vlt_4000.jpg/jcr:content/renditions/cq5dam.thumbnail.319.319.png","by":"FORS Team, 8.2-meter VLT Antu, ESO","src":"https://science.nasa.gov/image-article/apod-2023-january-29-barnard-68-dark-molecular-cloud/","from":"APOD"},{"k":"ad93","t":"dark","name":"뱀 성운","note":"뱀처럼 구불구불한 암흑성운이에요.","img":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2009/february/SGUSnakeLRVB.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg","th":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2009/february/SGUSnakeLRVB.jpg/jcr:content/renditions/cq5dam.thumbnail.319.319.png","by":"","src":"https://science.nasa.gov/image-article/apod-2009-february-20-snake-in-the-dark/","from":"APOD"},{"k":"ad97","t":"dark","name":"파이프 성운","note":"담배 파이프 모양을 닮은 암흑성운이에요.","img":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2020/august/pipenebula_rc3.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg","th":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2020/august/pipenebula_rc3.jpg/jcr:content/renditions/cq5dam.thumbnail.319.319.png","by":"Jose Mtanous","src":"https://science.nasa.gov/image-article/apod-2020-august-7-the-pipe-nebula/","from":"APOD"},{"k":"ad119","t":"dark","name":"독수리자리 암흑성운 (LDN 673)","note":"","img":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2022/october/LDN673.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg","th":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2022/october/LDN673.jpg/jcr:content/renditions/cq5dam.thumbnail.319.319.png","by":"Frank Sackenheim, Josef Poepsel, Stefan Binnewies ( Capella Observatory Team )","src":"https://science.nasa.gov/image-article/apod-2022-october-29-ldn-673-dark-clouds-in-aquila/","from":"APOD"},{"k":"ad120","t":"dark","name":"독수리자리 암흑성운","note":"","img":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2012/june/ldn673s_block.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg","th":"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2012/june/ldn673s_block.jpg/jcr:content/renditions/cq5dam.thumbnail.319.319.png","by":"Adam Block, Mt. Lemmon SkyCenter, University of Arizona","src":"https://science.nasa.gov/image-article/apod-2012-june-29-dark-clouds-in-aquila/","from":"APOD"},{"k":"caldwell-94","t":"open","name":"보석 상자 성단 (NGC 4755)","note":"허블 우주 망원경이 찍은 사진이에요.","img":"https://science.nasa.gov/wp-content/uploads/2023/04/c94-1-jpg.webp","th":"https://science.nasa.gov/wp-content/uploads/2023/04/c94-1-jpg.webp","by":"NASA, ESA, Hubble","src":"https://science.nasa.gov/mission/hubble/science/explore-the-night-sky/hubble-caldwell-catalog/caldwell-94/","from":"Hubble"},{"k":"messier-3","t":"globular","name":"M3 구상성단","note":"허블 우주 망원경이 성단의 가운데를 확대해 찍었어요.","img":"https://assets.science.nasa.gov/content/dam/science/missions/hubble/stars/globular-clusters/Hubble_M3_2019_potw1914a.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg","th":"https://assets.science.nasa.gov/content/dam/science/missions/hubble/stars/globular-clusters/Hubble_M3_2019_potw1914a.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg","by":"NASA, ESA, Hubble","src":"https://science.nasa.gov/mission/hubble/science/explore-the-night-sky/hubble-messier-catalog/messier-3/","from":"Hubble"},{"k":"messier-4","t":"globular","name":"M4 구상성단","note":"허블 우주 망원경이 찍은 사진이에요.","img":"https://assets.science.nasa.gov/content/dam/science/missions/hubble/stars/globular-clusters/Hubble_M4_WFC3_ACS_ok_flat_cont_FINAL_NewImage.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg","th":"https://assets.science.nasa.gov/content/dam/science/missions/hubble/stars/globular-clusters/Hubble_M4_WFC3_ACS_ok_flat_cont_FINAL_NewImage.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg","by":"NASA, ESA, Hubble","src":"https://science.nasa.gov/mission/hubble/science/explore-the-night-sky/hubble-messier-catalog/messier-4/","from":"Hubble"},{"k":"messier-5","t":"globular","name":"M5 구상성단","note":"허블 우주 망원경이 찍은 사진이에요.","img":"https://assets.science.nasa.gov/content/dam/science/missions/hubble/stars/globular-clusters/Hubble_M5_WFC3_UV_flat_FINAL_NewImage.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg","th":"https://assets.science.nasa.gov/content/dam/science/missions/hubble/stars/globular-clusters/Hubble_M5_WFC3_UV_flat_FINAL_NewImage.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg","by":"NASA, ESA, Hubble","src":"https://science.nasa.gov/mission/hubble/science/explore-the-night-sky/hubble-messier-catalog/messier-5/","from":"Hubble"},{"k":"messier-9","t":"globular","name":"M9 구상성단","note":"허블 우주 망원경이 찍은 사진이에요.","img":"https://science.nasa.gov/wp-content/uploads/2023/04/heic1205a-jpg.webp","th":"https://science.nasa.gov/wp-content/uploads/2023/04/heic1205a-jpg.webp","by":"NASA, ESA, Hubble","src":"https://science.nasa.gov/mission/hubble/science/explore-the-night-sky/hubble-messier-catalog/messier-9/","from":"Hubble"},{"k":"messier-13","t":"globular","name":"헤라클레스자리 구상성단 (M13)","note":"허블 우주 망원경이 찍은 사진이에요.","img":"https://assets.science.nasa.gov/content/dam/science/missions/hubble/stars/globular-clusters/Hubble_M13_2010_potw1011a.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg","th":"https://assets.science.nasa.gov/content/dam/science/missions/hubble/stars/globular-clusters/Hubble_M13_2010_potw1011a.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg","by":"NASA, ESA, Hubble","src":"https://science.nasa.gov/mission/hubble/science/explore-the-night-sky/hubble-messier-catalog/messier-13/","from":"Hubble"},{"k":"messier-15","t":"globular","name":"M15 구상성단","note":"허블 우주 망원경이 찍은 사진이에요.","img":"https://science.nasa.gov/wp-content/uploads/2023/04/heic1321a-jpg.webp","th":"https://science.nasa.gov/wp-content/uploads/2023/04/heic1321a-jpg.webp","by":"NASA, ESA, Hubble","src":"https://science.nasa.gov/mission/hubble/science/explore-the-night-sky/hubble-messier-catalog/messier-15/","from":"Hubble"},{"k":"messier-53","t":"globular","name":"M53 구상성단","note":"허블 우주 망원경이 찍은 사진이에요.","img":"https://science.nasa.gov/wp-content/uploads/2023/04/potw1140a-jpg.webp","th":"https://science.nasa.gov/wp-content/uploads/2023/04/potw1140a-jpg.webp","by":"NASA, ESA, Hubble","src":"https://science.nasa.gov/mission/hubble/science/explore-the-night-sky/hubble-messier-catalog/messier-53/","from":"Hubble"},{"k":"messier-55","t":"globular","name":"M55 구상성단","note":"허블 우주 망원경이 찍은 사진이에요.","img":"https://science.nasa.gov/wp-content/uploads/2023/06/hubble-m55-mos-acs-long-flat-final2-jpg.webp","th":"https://science.nasa.gov/wp-content/uploads/2023/06/hubble-m55-mos-acs-long-flat-final2-jpg.webp","by":"NASA, ESA, Hubble","src":"https://science.nasa.gov/mission/hubble/science/explore-the-night-sky/hubble-messier-catalog/messier-55/","from":"Hubble"},{"k":"messier-80","t":"globular","name":"M80 구상성단","note":"허블 우주 망원경이 찍은 사진이에요.","img":"https://science.nasa.gov/wp-content/uploads/2023/04/hubble_m80_wfc3_acs_comb_final2-jpg.webp","th":"https://science.nasa.gov/wp-content/uploads/2023/04/hubble_m80_wfc3_acs_comb_final2-jpg.webp","by":"NASA, ESA, Hubble","src":"https://science.nasa.gov/mission/hubble/science/explore-the-night-sky/hubble-messier-catalog/messier-80/","from":"Hubble"},{"k":"messier-92","t":"globular","name":"M92 구상성단","note":"허블 우주 망원경이 찍은 사진이에요.","img":"https://science.nasa.gov/wp-content/uploads/2023/04/potw1449a_0-jpg.webp","th":"https://science.nasa.gov/wp-content/uploads/2023/04/potw1449a_0-jpg.webp","by":"NASA, ESA, Hubble","src":"https://science.nasa.gov/mission/hubble/science/explore-the-night-sky/hubble-messier-catalog/messier-92/","from":"Hubble"},{"k":"caldwell-80","t":"globular","name":"오메가 센타우리","note":"허블 우주 망원경이 성단의 가운데를 찍었어요.","img":"https://assets.science.nasa.gov/content/dam/science/missions/hubble/releases/2024/07/STScI-01J1X25A66FJK08ZQSZP6TH1GZ.tif/jcr:content/renditions/cq5dam.web.1280.1280.jpeg","th":"https://assets.science.nasa.gov/content/dam/science/missions/hubble/releases/2024/07/STScI-01J1X25A66FJK08ZQSZP6TH1GZ.tif/jcr:content/renditions/cq5dam.web.1280.1280.jpeg","by":"NASA, ESA, Hubble","src":"https://science.nasa.gov/mission/hubble/science/explore-the-night-sky/hubble-caldwell-catalog/caldwell-80/","from":"Hubble"},{"k":"caldwell-106","t":"globular","name":"큰부리새자리 47 구상성단","note":"허블 우주 망원경이 찍은 사진이에요.","img":"https://science.nasa.gov/wp-content/uploads/2023/04/c106-1-jpg.webp","th":"https://science.nasa.gov/wp-content/uploads/2023/04/c106-1-jpg.webp","by":"NASA, ESA, Hubble","src":"https://science.nasa.gov/mission/hubble/science/explore-the-night-sky/hubble-caldwell-catalog/caldwell-106/","from":"Hubble"},{"k":"caldwell-86","t":"globular","name":"NGC 6397 구상성단","note":"허블 우주 망원경이 찍은 사진이에요.","img":"https://science.nasa.gov/wp-content/uploads/2023/04/c86-1b.png","th":"https://science.nasa.gov/wp-content/uploads/2023/04/c86-1b.png","by":"NASA, ESA, Hubble","src":"https://science.nasa.gov/mission/hubble/science/explore-the-night-sky/hubble-caldwell-catalog/caldwell-86/","from":"Hubble"},{"k":"messier-8","t":"emission","name":"석호 성운 (M8)","note":"허블 우주 망원경이 성운의 가운데를 찍었어요.","img":"https://assets.science.nasa.gov/content/dam/science/missions/hubble/nebulae/emission/Hubble_M8_ACS_1_flat_FINAL.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg","th":"https://assets.science.nasa.gov/content/dam/science/missions/hubble/nebulae/emission/Hubble_M8_ACS_1_flat_FINAL.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg","by":"NASA, ESA, Hubble","src":"https://science.nasa.gov/mission/hubble/science/explore-the-night-sky/hubble-messier-catalog/messier-8/","from":"Hubble"},{"k":"messier-16","t":"emission","name":"독수리 성운의 창조의 기둥 (M16)","note":"허블 우주 망원경이 찍은 가장 유명한 사진 중 하나예요.","img":"https://science.nasa.gov/wp-content/uploads/2023/04/hubble_birthofstars_0-jpg.webp","th":"https://science.nasa.gov/wp-content/uploads/2023/04/hubble_birthofstars_0-jpg.webp","by":"NASA, ESA, Hubble","src":"https://science.nasa.gov/mission/hubble/science/explore-the-night-sky/hubble-messier-catalog/messier-16/","from":"Hubble"},{"k":"messier-42","t":"emission","name":"오리온 대성운 (M42)","note":"맨눈으로도 보이는 방출성운이에요. 허블 사진 520장을 이어 붙였어요.","img":"https://science.nasa.gov/wp-content/uploads/2023/04/orion-nebula-xlarge_web-jpg.webp","th":"https://science.nasa.gov/wp-content/uploads/2023/04/orion-nebula-xlarge_web-jpg.webp","by":"NASA, ESA, Hubble","src":"https://science.nasa.gov/mission/hubble/science/explore-the-night-sky/hubble-messier-catalog/messier-42/","from":"Hubble"},{"k":"messier-43","t":"emission","name":"M43 성운","note":"오리온 대성운 바로 옆에 있어요.","img":"https://science.nasa.gov/wp-content/uploads/2023/04/heic0601c-jpg.webp","th":"https://science.nasa.gov/wp-content/uploads/2023/04/heic0601c-jpg.webp","by":"NASA, ESA, Hubble","src":"https://science.nasa.gov/mission/hubble/science/explore-the-night-sky/hubble-messier-catalog/messier-43/","from":"Hubble"},{"k":"caldwell-9","t":"emission","name":"동굴 성운","note":"허블 우주 망원경이 찍은 사진이에요.","img":"https://science.nasa.gov/wp-content/uploads/2023/04/sh2_155_wfpc2_final-jpg.webp","th":"https://science.nasa.gov/wp-content/uploads/2023/04/sh2_155_wfpc2_final-jpg.webp","by":"NASA, ESA, Hubble","src":"https://science.nasa.gov/mission/hubble/science/explore-the-night-sky/hubble-caldwell-catalog/caldwell-9/","from":"Hubble"},{"k":"caldwell-11","t":"emission","name":"거품 성운","note":"아주 뜨거운 별이 내뿜는 바람이 거품을 만들었어요.","img":"https://science.nasa.gov/wp-content/uploads/2023/04/c11-1-jpg.webp","th":"https://science.nasa.gov/wp-content/uploads/2023/04/c11-1-jpg.webp","by":"NASA, ESA, Hubble","src":"https://science.nasa.gov/mission/hubble/science/explore-the-night-sky/hubble-caldwell-catalog/caldwell-11/","from":"Hubble"},{"k":"caldwell-92","t":"emission","name":"용골자리 성운","note":"허블 우주 망원경이 찍은 사진이에요.","img":"https://science.nasa.gov/wp-content/uploads/2023/04/c92-1-jpg.webp","th":"https://science.nasa.gov/wp-content/uploads/2023/04/c92-1-jpg.webp","by":"NASA, ESA, Hubble","src":"https://science.nasa.gov/mission/hubble/science/explore-the-night-sky/hubble-caldwell-catalog/caldwell-92/","from":"Hubble"},{"k":"caldwell-103","t":"emission","name":"타란툴라 성운","note":"이웃 은하(대마젤란은하)에 있는 거대한 방출성운이에요.","img":"https://assets.science.nasa.gov/content/dam/science/missions/hubble/nebulae/emission/Hubble_LMC_TarantulaNebula_potw2506a.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg","th":"https://assets.science.nasa.gov/content/dam/science/missions/hubble/nebulae/emission/Hubble_LMC_TarantulaNebula_potw2506a.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg","by":"NASA, ESA, Hubble","src":"https://science.nasa.gov/mission/hubble/science/explore-the-night-sky/hubble-caldwell-catalog/caldwell-103/","from":"Hubble"},{"k":"messier-45","t":"reflection","name":"플레이아데스 속 반사성운 (IC 349)","note":"허블 우주 망원경이 플레이아데스 성단 안을 확대해 찍었어요.","img":"https://science.nasa.gov/wp-content/uploads/2023/04/interstellar_cloud_in_pleiades-jpg.webp","th":"https://science.nasa.gov/wp-content/uploads/2023/04/interstellar_cloud_in_pleiades-jpg.webp","by":"NASA, ESA, Hubble","src":"https://science.nasa.gov/mission/hubble/science/explore-the-night-sky/hubble-messier-catalog/messier-45/","from":"Hubble"},{"k":"caldwell-4","t":"reflection","name":"아이리스 성운 (NGC 7023)","note":"허블 우주 망원경이 찍은 사진이에요.","img":"https://science.nasa.gov/wp-content/uploads/2023/04/c4-jpg.webp","th":"https://science.nasa.gov/wp-content/uploads/2023/04/c4-jpg.webp","by":"NASA, ESA, Hubble","src":"https://science.nasa.gov/mission/hubble/science/explore-the-night-sky/hubble-caldwell-catalog/caldwell-4/","from":"Hubble"},{"k":"caldwell-46","t":"reflection","name":"허블의 변광 성운 (NGC 2261)","note":"허블이라는 천문학자가 처음 연구한 반사성운이에요.","img":"https://science.nasa.gov/wp-content/uploads/2023/04/c46-1-jpg.webp","th":"https://science.nasa.gov/wp-content/uploads/2023/04/c46-1-jpg.webp","by":"NASA, ESA, Hubble","src":"https://science.nasa.gov/mission/hubble/science/explore-the-night-sky/hubble-caldwell-catalog/caldwell-46/","from":"Hubble"},{"k":"caldwell-68","t":"reflection","name":"NGC 6729 반사성운","note":"밝기가 변하는 젊은 별이 빛을 비춰요.","img":"https://science.nasa.gov/wp-content/uploads/2023/04/ngc6729_wfpc2_field1_1color_cropfinal-jpg.webp","th":"https://science.nasa.gov/wp-content/uploads/2023/04/ngc6729_wfpc2_field1_1color_cropfinal-jpg.webp","by":"NASA, ESA, Hubble","src":"https://science.nasa.gov/mission/hubble/science/explore-the-night-sky/hubble-caldwell-catalog/caldwell-68/","from":"Hubble"}];
+const TYPES = {
+  open:      {name:"산개성단", group:"성단", cls:"t-open",
+    short:"듬성듬성 · 파란 별", clue:"별이 듬성듬성 불규칙하게 모여 있어요. 젊고 뜨거운 파란색·흰색 별이 많아요."},
+  globular:  {name:"구상성단", group:"성단", cls:"t-globular",
+    short:"빽빽한 공 · 붉은 별", clue:"아주 많은 별이 공 모양으로 빽빽하게 모여 있고 가운데가 밝아요. 늙은 붉은색·노란색 별이 많아요."},
+  emission:  {name:"방출성운", group:"성운", cls:"t-emission",
+    short:"붉게 스스로 빛남", clue:"가스 구름이 붉게 빛나요. 근처 뜨거운 별의 에너지를 받아 스스로 빛을 내는 성운이에요."},
+  reflection:{name:"반사성운", group:"성운", cls:"t-reflection",
+    short:"파랗게 별빛 반사", clue:"밝은 별 주변의 구름이 파랗게 보여요. 스스로 빛나지 않고 별빛을 반사하는 성운이에요."},
+  dark:      {name:"암흑성운", group:"성운", cls:"t-dark",
+    short:"검게 별빛을 가림", clue:"별이 가득한 배경 가운데 검은 구름이 있어요. 가스와 먼지가 뒤쪽 별빛을 가리는 성운이에요."}
+};
+const ORDER=["open","globular","emission","reflection","dark"];
+const BYK=Object.fromEntries(PHOTOS.map(p=>[p.k,p]));
+const PLAY=PHOTOS.filter(p=>!p.learn);
+
+const $=s=>document.querySelector(s);
+function el(tag,attrs={},html=""){ const e=document.createElement(tag); for(const k in attrs) e.setAttribute(k,attrs[k]); if(html) e.innerHTML=html; return e; }
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const chip=t=>`<span class="chip ${TYPES[t].cls}"><span>${TYPES[t].name}</span></span>`;
+const icon=t=>`<svg aria-hidden="true"><use href="#i-${t}"/></svg>`;
+const shuffle=a=>{ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.random()*(i+1)|0; [a[i],a[j]]=[a[j],a[i]]; } return a; };
+const store={ get(k,d){ try{ const v=localStorage.getItem(k); return v?JSON.parse(v):d; }catch(e){ return d; } }, set(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); return true; }catch(e){ return false; } } };
+const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+const TOUCH=matchMedia("(pointer: coarse)").matches;
+function toast(msg){ const t=el("div",{class:"toast",role:"status"}); t.textContent=msg; document.body.append(t); setTimeout(()=>t.remove(),1800); }
+function credit(p){ return (p.by?"사진: "+p.by+" · ":"")+(p.from==="Hubble"?"NASA 허블":"NASA APOD"); }
+function photoBox(p,{big=false,cap=true}={}){
+  const box=el("div",{class:"photo"}); box.append(el("div",{class:"loader"}));
+  const img=new Image(); img.alt=p.name; img.decoding="async"; if(!big) img.loading="lazy";
+  img.onload=()=>box.querySelector(".loader")?.remove();
+  img.onerror=()=>{ if(big&&img.src!==p.th){ img.src=p.th; return; } box.querySelector(".loader")?.remove(); box.append(el("div",{class:"credit",style:"top:0;display:grid;place-items:center;background:#0008"},"사진을 불러오지 못했어요")); };
+  img.src=big?p.img:p.th; box.prepend(img);
+  if(cap){ const c=el("div",{class:"credit"}); c.textContent=credit(p); box.append(c); }
+  return box;
+}
+
+/* ===================== 마스코트 ===================== */
+const MOUTH={ normal:"M52 72 Q60 80 68 72", happy:"M48 70 Q60 88 72 70 Z", sad:"M52 78 Q60 70 68 78" };
+function mood(svg,m){ if(!svg) return; const mo=svg.querySelector(".mouth"); mo.setAttribute("d",MOUTH[m]); mo.setAttribute("fill",m==="happy"?"#2b2250":"none");
+  svg.classList.remove("happy","sad"); try{ void svg.getBBox(); }catch(e){} if(m!=="normal") svg.classList.add(m); clearTimeout(svg._t); svg._t=setTimeout(()=>mood(svg,"normal"),1400); }
+function mascotSVG(id){ return `<svg class="mascot" ${id?`id="${id}"`:""} viewBox="0 0 120 120" aria-hidden="true"><use href="#m-star"/><g class="eyes"><ellipse cx="49" cy="58" rx="5" ry="7" fill="#2b2250"/><ellipse cx="71" cy="58" rx="5" ry="7" fill="#2b2250"/><circle cx="51" cy="55" r="2" fill="#fff"/><circle cx="73" cy="55" r="2" fill="#fff"/></g><path class="mouth" d="${MOUTH.normal}" stroke="#2b2250" stroke-width="4" fill="none" stroke-linecap="round"/></svg>`; }
+function say(t){ $("#talk").textContent=t; }
+
+/* ===================== 반짝이는 배경 ===================== */
+(function(){
+  const cv=$("#stars"), ctx=cv.getContext("2d"); let W,H,S=[],shoot=null,last=0;
+  function size(){ W=cv.width=innerWidth*devicePixelRatio; H=cv.height=innerHeight*devicePixelRatio; cv.style.width=innerWidth+"px"; cv.style.height=innerHeight+"px";
+    S=Array.from({length:Math.round(innerWidth*innerHeight/5000)},()=>({x:Math.random()*W,y:Math.random()*H,r:(Math.random()*1.4+.3)*devicePixelRatio,p:Math.random()*6.28,s:.5+Math.random()*2,c:Math.random()<.15?"#ffd8a8":Math.random()<.2?"#bcd7ff":"#ffffff"})); }
+  function frame(t){
+    if(t-last>33){ last=t; ctx.clearRect(0,0,W,H);
+      for(const s of S){ const a=reduce?.7:.35+.65*(.5+.5*Math.sin(t/1000*s.s+s.p)); ctx.globalAlpha=a; ctx.fillStyle=s.c; ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,6.28); ctx.fill(); }
+      if(!reduce){
+        if(!shoot && Math.random()<.006) shoot={x:Math.random()*W*.8,y:Math.random()*H*.4,vx:(8+Math.random()*6)*devicePixelRatio,vy:(3+Math.random()*3)*devicePixelRatio,life:1};
+        if(shoot){ const g=ctx.createLinearGradient(shoot.x,shoot.y,shoot.x-shoot.vx*10,shoot.y-shoot.vy*10); g.addColorStop(0,"#fff"); g.addColorStop(1,"#fff0");
+          ctx.globalAlpha=shoot.life; ctx.strokeStyle=g; ctx.lineWidth=2*devicePixelRatio; ctx.beginPath(); ctx.moveTo(shoot.x,shoot.y); ctx.lineTo(shoot.x-shoot.vx*10,shoot.y-shoot.vy*10); ctx.stroke();
+          shoot.x+=shoot.vx; shoot.y+=shoot.vy; shoot.life-=.02; if(shoot.life<=0) shoot=null; }
+      }
+      ctx.globalAlpha=1;
+    }
+    requestAnimationFrame(frame);
+  }
+  addEventListener("resize",size); size(); requestAnimationFrame(frame);
+})();
+
+/* ===================== 축하 꽃가루 ===================== */
+const confetti=(function(){
+  const cv=$("#confetti"), ctx=cv.getContext("2d"); let P=[], running=false;
+  function size(){ cv.width=innerWidth; cv.height=innerHeight; } addEventListener("resize",size); size();
+  const COLS=["#ffd166","#ff8fc7","#7ef0d0","#7cc4ff","#b8a1ff","#ffffff"];
+  function tick(){ ctx.clearRect(0,0,cv.width,cv.height);
+    P=P.filter(p=>p.life>0); for(const p of P){ p.vy+=.25; p.x+=p.vx; p.y+=p.vy; p.rot+=p.vr; p.life-=1;
+      ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.rot); ctx.globalAlpha=Math.min(1,p.life/30); ctx.fillStyle=p.c;
+      if(p.star){ ctx.beginPath(); for(let i=0;i<10;i++){ const r=i%2?p.s*.45:p.s; ctx.lineTo(Math.cos(i*Math.PI/5)*r,Math.sin(i*Math.PI/5)*r); } ctx.fill(); } else ctx.fillRect(-p.s/2,-p.s/4,p.s,p.s/2);
+      ctx.restore(); }
+    if(P.length) requestAnimationFrame(tick); else running=false; }
+  return function(x,y,n=40){ if(reduce) return; for(let i=0;i<n;i++){ const a=Math.random()*Math.PI*2, v=3+Math.random()*7;
+      P.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v-5,rot:Math.random()*6,vr:(Math.random()-.5)*.4,s:6+Math.random()*8,c:COLS[i%COLS.length],star:Math.random()<.4,life:60+Math.random()*40}); }
+    if(!running){ running=true; requestAnimationFrame(tick); } };
+})();
+
+/* ===================== 라이트박스 ===================== */
+let modalDl=null;
+function openPhoto(p){
+  $("#mdImg").src=p.img; $("#mdImg").alt=p.name; $("#mdImg").onerror=function(){ if(this.src!==p.th) this.src=p.th; };
+  $("#mdChip").innerHTML=chip(p.t); $("#mdTitle").textContent=p.name;
+  $("#mdNote").textContent=(p.note?p.note+" ":"")+TYPES[p.t].clue;
+  $("#mdSrc").textContent=credit(p);
+  const a=$("#mdLink"); a.hidden=false; a.href=p.src; $("#mdDl").hidden=true; modalDl=null;
+  $("#modal").hidden=false; $("#mdClose").focus();
+}
+function openCard(cv,name){
+  $("#mdImg").src=cv.toDataURL("image/png"); $("#mdImg").alt="천체 카드"; $("#mdImg").onerror=null;
+  $("#mdChip").innerHTML=""; $("#mdTitle").textContent=name+" 천체 카드"; $("#mdNote").textContent="카드 그림을 오른쪽 클릭(휴대폰은 길게 누르기)해서 저장할 수도 있어요."; $("#mdSrc").textContent="";
+  $("#mdLink").hidden=true; $("#mdDl").hidden=false; modalDl={cv,name}; $("#modal").hidden=false; $("#mdClose").focus();
+}
+$("#mdClose").addEventListener("click",()=>$("#modal").hidden=true);
+$("#modal").addEventListener("click",e=>{ if(e.target.id==="modal") $("#modal").hidden=true; });
+document.addEventListener("keydown",e=>{ if(e.key==="Escape") $("#modal").hidden=true; });
+$("#mdDl").addEventListener("click",()=>{ if(!modalDl) return; const a=el("a",{href:modalDl.cv.toDataURL("image/png"),download:(modalDl.name||"천체")+"_천체카드.png"}); document.body.append(a); a.click(); a.remove(); });
+
+/* ===================== 탭 ===================== */
+const tabs=[...document.querySelectorAll("nav.tabs button")];
+const TALK={learn:"성단은 별의 무리, 성운은 가스와 먼지의 구름이야!",game:"사진을 보고 알맞은 상자에 쏙 넣어 줘!",gallery:"진짜 NASA 사진이야. 이름을 가리고 맞혀 볼래?",make:"세상에 하나뿐인 천체를 만들어 보자!"};
+function showTab(name){
+  tabs.forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===name));
+  document.querySelectorAll("section.page").forEach(s=>s.hidden=s.id!=="tab-"+name);
+  say(TALK[name]); mood($("#mascotTop"),"happy");
+  if(name==="gallery" && !gallery.made) gallery.draw();
+  if(name==="game" && !game.ready) game.home();
+  if(name==="make") maker.draw();
+  store.set("nebula-tab",name);
+}
+tabs.forEach(b=>b.addEventListener("click",()=>showTab(b.dataset.tab)));
+document.querySelectorAll("[data-go]").forEach(b=>b.addEventListener("click",()=>{ showTab(b.dataset.go); scrollTo({top:0,behavior:"smooth"}); }));
+
+/* ===================== 개념 사진 ===================== */
+document.querySelectorAll("#tab-learn [data-k]").forEach(n=>{
+  const p=BYK[n.dataset.k]; if(!p) return;
+  const box=photoBox(p); const target=n.classList.contains("photo")?n:n.querySelector(".photo");
+  target.replaceWith(box); if(n.classList.contains("photo")) box.dataset.k=p.k;
+  (n.tagName==="FIGURE"?n:box).addEventListener("click",()=>openPhoto(p)); box.style.cursor="zoom-in";
+});
+
+/* ===================== 분류 게임 ===================== */
+const game={
+  ready:false, mode:"adv", kind:"ten",
+  home(){
+    this.ready=true; clearInterval(this.timer);
+    const g=$("#game"); g.innerHTML="";
+    const s=el("div",{class:"card start"});
+    s.innerHTML=`${mascotSVG("mascotGame")}<h3>사진 분류 대작전</h3>
+      <p class="lead">NASA 사진이 하나씩 랜덤으로 나와요. ${TOUCH?"알맞은 <b>상자를 눌러서</b> 분류해요.":"사진을 <b>알맞은 상자로 끌어다 놓거나</b> 상자를 눌러 분류해요."}<br>연속으로 맞히면 <b>콤보 점수</b>가 붙어요!</p>
+      <div style="display:grid;gap:10px;justify-items:center"><span class="lead">상자 종류</span><div class="seg" id="sMode"><button data-v="basic">기초 · 성단 / 성운</button><button data-v="adv">심화 · 5가지</button></div></div>
+      <div style="display:grid;gap:10px;justify-items:center"><span class="lead">도전 방법</span><div class="seg" id="sKind"><button data-v="ten">10문제</button><button data-v="speed">60초 스피드</button></div></div>
+      <div class="namebox"><label class="lead" for="pName">내 이름 (결과 화면에 나와요)</label><input type="text" id="pName" maxlength="20" placeholder="예: 2-3 김별"></div>
+      <button class="btn yellow" id="sGo" style="font-size:1.15rem;padding:14px 30px">시작하기</button>`;
+    g.append(s);
+    const seg=(id,key)=>{ const box=s.querySelector(id); const upd=()=>[...box.children].forEach(b=>b.setAttribute("aria-pressed",b.dataset.v===this[key])); box.addEventListener("click",e=>{ const b=e.target.closest("button"); if(b){ this[key]=b.dataset.v; upd(); } }); upd(); };
+    seg("#sMode","mode"); seg("#sKind","kind");
+    const nm=s.querySelector("#pName"); nm.value=store.get("nebula-name","");
+    nm.addEventListener("input",()=>store.set("nebula-name",nm.value.trim()));
+    s.querySelector("#sGo").addEventListener("click",()=>{ this.player=nm.value.trim(); this.start(); });
+  },
+  deck(){
+    // 종류가 고르게 섞이도록 종류별로 섞은 뒤 번갈아 뽑기
+    const by=ORDER.map(t=>shuffle(PLAY.filter(p=>p.t===t)));
+    const out=[]; let k=0; while(out.length<PLAY.length){ const L=by[k%5]; if(L.length) out.push(L.pop()); k++; }
+    const d=[]; for(let i=0;i<out.length;i+=5) d.push(...shuffle(out.slice(i,i+5)));
+    return d;
+  },
+  start(){
+    this.deckList=this.deck(); this.i=0; this.score=0; this.combo=0; this.best=0; this.log=[]; this.counts={};
+    this.total=this.kind==="ten"?10:Infinity; this.time=60; this.lock=false;
+    const g=$("#game"); g.innerHTML="";
+    const bar=el("div",{class:"gbar"});
+    bar.innerHTML=`<div class="hud"><div><span class="lab">${this.kind==="ten"?"문제":"남은 시간"}</span><span id="hQ"></span></div><div><span class="lab">점수</span><span id="hS">0</span></div><div class="combo"><span class="lab">콤보</span><span id="hC">0</span></div></div><button class="btn" id="hQuit">처음으로</button>`;
+    g.append(bar, el("div",{class:"progress"},`<i id="hP" style="width:0"></i>`));
+    const st=el("div",{class:"stage"});
+    st.innerHTML=`<div class="scope"><div id="slot"></div></div><div class="side"><p class="ask">${this.mode==="basic"?"이 사진은 성단일까, 성운일까?":"어느 상자에 넣을까?"}</p><div class="bins ${this.mode==="basic"?"two":""}" id="bins"></div><div id="fb"></div></div>`;
+    g.append(st);
+    const bins=st.querySelector("#bins");
+    const B=this.mode==="basic"?[["성단","open","별의 무리 · 점이 모여 있음"],["성운","emission","가스·먼지 구름"]]:ORDER.map(t=>[t,t,TYPES[t].short]);
+    B.forEach(([k,ic,sm])=>{
+      const b=el("button",{class:"bin "+(this.mode==="basic"?(k==="성단"?"t-open":"t-emission"):TYPES[k].cls),type:"button"});
+      b.dataset.k=k;
+      b.innerHTML=`<span class="cnt">0</span>${this.mode==="basic"?(k==="성단"?icon("open")+"":icon("emission")):icon(ic)}<span class="lbl">${this.mode==="basic"?k:TYPES[k].name}</span><small>${sm}</small>`;
+      b.addEventListener("click",()=>this.answer(k,b));
+      bins.append(b);
+    });
+    bar.querySelector("#hQuit").addEventListener("click",()=>this.home());
+    if(this.kind==="speed"){ clearInterval(this.timer); this.timer=setInterval(()=>{ this.time--; this.hud(); if(this.time<=0){ clearInterval(this.timer); this.result(); } },1000); }
+    say(TOUCH?"알맞은 상자를 눌러 봐!":"사진을 상자로 끌어다 놓아 봐!");
+    this.show();
+  },
+  hud(){
+    $("#hQ").textContent=this.kind==="ten"?`${Math.min(this.i+1,10)} / 10`:`${this.time}초`;
+    $("#hS").textContent=this.score; $("#hC").textContent=this.combo;
+    $("#hP").style.width=(this.kind==="ten"?this.i/10:(60-this.time)/60)*100+"%";
+  },
+  show(){
+    if(!$("#slot")) return;
+    if(this.i>=this.total) return this.result();
+    if(this.i>=this.deckList.length){ this.deckList=this.deckList.concat(this.deck()); }
+    const p=this.cur=this.deckList[this.i];
+    const slot=$("#slot"); slot.innerHTML="";
+    const box=photoBox(p,{big:true}); box.classList.add("enter");
+    box.append(el("span",{class:"tip"},TOUCH?"알맞은 상자를 눌러 줘":"끌어서 상자에 넣기"));
+    slot.append(box); this.box=box; this.lock=false;
+    $("#fb").innerHTML="";
+    document.querySelectorAll(".bin").forEach(b=>{ b.disabled=false; b.classList.remove("right","wrong","hintglow"); });
+    this.drag(box); this.hud();
+    const nx=this.deckList[this.i+1]; if(nx){ const im=new Image(); im.src=nx.img; }
+  },
+  drag(box){
+    let ghost=null, over=null;
+    const binAt=(x,y)=>document.elementFromPoint(x,y)?.closest(".bin");
+    box.addEventListener("pointerdown",e=>{
+      if(this.lock) return; e.preventDefault(); box.setPointerCapture(e.pointerId); box.classList.add("drag");
+      ghost=el("div",{class:"ghost"}); const im=box.querySelector("img").cloneNode(); ghost.append(im); document.body.append(ghost);
+      ghost.style.left=e.clientX+"px"; ghost.style.top=e.clientY+"px";
+    });
+    box.addEventListener("pointermove",e=>{
+      if(!ghost) return; ghost.style.left=e.clientX+"px"; ghost.style.top=e.clientY+"px";
+      const b=binAt(e.clientX,e.clientY); if(b!==over){ over?.classList.remove("over"); over=b; over?.classList.add("over"); }
+    });
+    const end=e=>{
+      if(!ghost) return; box.classList.remove("drag");
+      const b=binAt(e.clientX,e.clientY); ghost.remove(); ghost=null; over?.classList.remove("over"); over=null;
+      if(b && !b.disabled) this.answer(b.dataset.k,b,true);
+    };
+    box.addEventListener("pointerup",end); box.addEventListener("pointercancel",end);
+  },
+  answer(k,binEl,dropped){
+    if(this.lock) return; this.lock=true;
+    const p=this.cur, right=this.mode==="basic"?TYPES[p.t].group:p.t, ok=k===right;
+    this.log.push({p,pick:k,ok});
+    const r=binEl.getBoundingClientRect();
+    document.querySelectorAll(".bin").forEach(b=>b.disabled=true);
+    const fb=$("#fb"); const gm=$("#mascotTop");
+    if(ok){
+      this.combo++; this.best=Math.max(this.best,this.combo); const add=10+(this.combo>1?Math.min(this.combo-1,5)*2:0); this.score+=add;
+      binEl.classList.add("right");
+      // 사진이 상자로 날아가기
+      const br=this.box.getBoundingClientRect();
+      this.box.style.transform=`translate(${r.left+r.width/2-(br.left+br.width/2)}px,${r.top+r.height/2-(br.top+br.height/2)}px) scale(.12) rotate(20deg)`;
+      this.box.classList.add("fly");
+      setTimeout(()=>{ binEl.classList.add("gulp"); const c=binEl.querySelector(".cnt"); c.textContent=+c.textContent+1; confetti(r.left+r.width/2,r.top+r.height/2,this.combo>=3?70:40); },420);
+      setTimeout(()=>binEl.classList.remove("gulp"),950);
+      fb.innerHTML=`<div class="fb ok"><span class="big">정답! +${add}점${this.combo>=2?` · ${this.combo}콤보!`:""}</span><span>${esc(p.name)} ${chip(p.t)}</span><span class="nm">${TYPES[p.t].clue}</span></div>`;
+      mood(gm,"happy"); say(this.combo>=3?`우와, ${this.combo}개 연속 정답이야!`:"딩동댕! 잘했어!");
+      this.i++; this.hud();
+      setTimeout(()=>this.show(),this.kind==="speed"?900:1700);
+    } else {
+      this.combo=0; binEl.classList.add("wrong"); this.box.classList.add("shake");
+      const rb=[...document.querySelectorAll(".bin")].find(b=>b.dataset.k===right); rb?.classList.add("hintglow");
+      mood(gm,"sad"); say("괜찮아! 반짝이는 상자가 정답이야.");
+      fb.innerHTML=`<div class="fb no"><span class="big">아쉬워요! 정답은 ${this.mode==="basic"?right:TYPES[right].name}</span><span>${esc(p.name)} ${chip(p.t)}</span><span class="nm">${TYPES[p.t].clue}</span></div>`;
+      this.i++; this.hud();
+      if(this.kind==="speed"){ setTimeout(()=>this.show(),1500); }
+      else { const nb=el("button",{class:"btn yellow",type:"button"},this.i<10?"다음 사진":"결과 보기"); nb.addEventListener("click",()=>this.show()); fb.append(nb); nb.focus(); }
+    }
+  },
+  result(){
+    clearInterval(this.timer);
+    const n=this.log.length, ok=this.log.filter(x=>x.ok).length, rate=n?ok/n:0;
+    const stars=rate>=.9?3:rate>=.7?2:rate>=.4?1:0;
+    const rank=stars===3?"성단·성운 박사":stars===2?"우주 관측 대원":stars===1?"꼬마 천문학자":"우주 견습생";
+    const g=$("#game"); g.innerHTML="";
+    const R=el("div",{class:"card result"});
+    R.innerHTML=`${mascotSVG("mascotRes")}<div class="stars3">${[1,2,3].map(i=>`<span class="${i<=stars?"on":""}">★</span>`).join("")}</div>
+      <span class="tag">${esc(this.player||"이름 없음")} · ${new Date().toLocaleDateString("ko-KR")} · ${this.mode==="basic"?"기초":"심화"} ${this.kind==="ten"?"10문제":"60초 스피드"}</span><div class="score">${this.score}점</div><p class="rank">${rank}</p><p class="lead">${n}장 중 ${ok}장 정답 · 최고 콤보 ${this.best}</p>`;
+    const rows=el("div",{class:"rows"});
+    ORDER.forEach(t=>{ const L=this.log.filter(x=>x.p.t===t); if(!L.length) return; const c=L.filter(x=>x.ok).length;
+      rows.append(el("div",{},`${chip(t)}<div class="progress"><i style="width:${c/L.length*100}%"></i></div><span>${c}/${L.length}</span>`)); });
+    R.append(rows);
+    R.append(el("p",{class:"lead"},"이 화면을 캡처해서 선생님께 보내요."));
+    if(n){ R.append(el("p",{class:"lead"},"사진을 눌러 다시 살펴봐요")); const rv=el("div",{class:"review"});
+      this.log.forEach(x=>{ const b=el("button",{type:"button",class:x.ok?"ok":"no"}); const ph=photoBox(x.p,{cap:false}); ph.append(el("span",{class:"mark"},x.ok?"O":"X")); b.append(ph,el("span",{},esc(x.p.name))); b.addEventListener("click",()=>openPhoto(x.p)); rv.append(b); });
+      R.append(rv); }
+    const act=el("div",{class:"actions",style:"justify-content:center"});
+    const again=el("button",{class:"btn yellow",type:"button"},"다시 도전"); again.addEventListener("click",()=>this.start());
+    const home=el("button",{class:"btn",type:"button"},"방법 바꾸기"); home.addEventListener("click",()=>this.home());
+    act.append(again,home); R.append(act); g.append(R);
+    const best=store.get("nebula-best",0); if(this.score>best){ store.set("nebula-best",this.score); if(best) R.querySelector(".lead").insertAdjacentHTML("afterend",`<p class="rank" style="color:var(--yellow)">새 최고 기록!</p>`); }
+    say(stars>=2?"정말 멋져! 너는 우주 탐험가야!":"한 번 더 하면 분명 더 잘할 거야!");
+    if(stars>=2){ const b=R.querySelector(".stars3").getBoundingClientRect(); setTimeout(()=>confetti(b.left+b.width/2,b.top+20,120),500); }
+    mood($("#mascotRes"),stars>=1?"happy":"sad");
+  }
+};
+
+/* ===================== 사진 도감 ===================== */
+const gallery={
+  made:false, filter:"all", list:PHOTOS.slice(),
+  draw(){
+    this.made=true; const grid=$("#gGrid"), hide=$("#gHide").checked; grid.innerHTML="";
+    this.list.forEach(p=>{
+      if(this.filter!=="all" && p.t!==this.filter) return;
+      const c=el("button",{class:"gcard"+(hide?" q":""),type:"button"});
+      const nm=el("div",{class:"nm"}), meta=el("div",{class:"meta"});
+      const reveal=()=>{ nm.textContent=p.name; meta.innerHTML=chip(p.t); c.classList.remove("q"); };
+      if(hide){ nm.textContent="무엇일까요? 눌러서 확인"; meta.innerHTML=`<span class="chip" style="color:#ffffff33"><span style="color:var(--ink)">?</span></span>`; } else reveal();
+      c.append(photoBox(p,{cap:false}),nm,meta);
+      c.addEventListener("click",()=>{ if(c.classList.contains("q")){ c.classList.add("flip"); setTimeout(reveal,250); setTimeout(()=>c.classList.remove("flip"),500); } else openPhoto(p); });
+      grid.append(c);
+    });
+  }
+};
+$("#gCount").textContent=PHOTOS.length;
+(function(){
+  const f=$("#gFilters");
+  [["all","전체"],...ORDER.map(t=>[t,TYPES[t].name])].forEach(([k,label])=>{
+    const b=el("button",{type:"button","aria-pressed":k==="all",class:k==="all"?"all":TYPES[k].cls},`<span>${label}</span>`);
+    b.addEventListener("click",()=>{ gallery.filter=k; [...f.children].forEach(c=>c.setAttribute("aria-pressed",c===b)); gallery.draw(); });
+    f.append(b);
+  });
+  $("#gHide").addEventListener("change",()=>gallery.draw());
+  $("#gShuffle").addEventListener("click",()=>{ gallery.list=shuffle(gallery.list); gallery.draw(); });
+})();
+
+/* ===================== 그리기 엔진 (나만의 천체) ===================== */
+function rng(seed){ let a=seed>>>0; return function(){ a=(a+0x6D2B79F5)|0; let t=Math.imul(a^(a>>>15),1|a); t=(t+Math.imul(t^(t>>>7),61|t))^t; return ((t^(t>>>14))>>>0)/4294967296; }; }
+function makeNoise(r){
+  const p=new Uint8Array(512), v=new Float32Array(256);
+  for(let i=0;i<256;i++){ p[i]=i; v[i]=r(); }
+  for(let i=255;i>0;i--){ const j=(r()*(i+1))|0; const t=p[i]; p[i]=p[j]; p[j]=t; }
+  for(let i=0;i<256;i++) p[i+256]=p[i];
+  function n2(x,y){ const xi=Math.floor(x), yi=Math.floor(y), xf=x-xi, yf=y-yi, u=xf*xf*(3-2*xf), w=yf*yf*(3-2*yf), X=xi&255, Y=yi&255;
+    const a=v[p[p[X]+Y]], b=v[p[p[X+1]+Y]], c=v[p[p[X]+Y+1]], d=v[p[p[X+1]+Y+1]]; return a+(b-a)*u+(c-a)*w+(a-b-c+d)*u*w; }
+  function fbm(x,y,o){ let s=0,amp=.5,f=1,n=0; for(let i=0;i<o;i++){ s+=amp*n2(x*f+i*17.3,y*f-i*9.1); n+=amp; f*=2.03; amp*=.5; } return s/n; }
+  return {n2,fbm};
+}
+const smooth=(e0,e1,x)=>{ let t=(x-e0)/(e1-e0); t=t<0?0:t>1?1:t; return t*t*(3-2*t); };
+function hueRGB(h,s=.9,l=.5){ h=((h%360)+360)%360/360; const q=l<.5?l*(1+s):l+s-l*s, p=2*l-q;
+  const f=t=>{ t=(t+1)%1; return t<1/6?p+(q-p)*6*t:t<.5?q:t<2/3?p+(q-p)*(2/3-t)*6:p; }; return [f(h+1/3),f(h),f(h-1/3)]; }
+function starColor(t){ const S=[[0,[1,.5,.32]],[.3,[1,.78,.55]],[.55,[1,.96,.9]],[.75,[.85,.9,1]],[1,[.58,.72,1]]]; t=Math.max(0,Math.min(1,t));
+  for(let i=1;i<S.length;i++){ if(t<=S[i][0]){ const a=S[i-1],b=S[i],k=(t-a[0])/(b[0]-a[0]); return [0,1,2].map(j=>a[1][j]+(b[1][j]-a[1][j])*k); } } return S[S.length-1][1]; }
+class Buf{
+  constructor(w,h){ this.w=w; this.h=h; this.r=new Float32Array(w*h); this.g=new Float32Array(w*h); this.b=new Float32Array(w*h); this.u=w/400; }
+  splat(x,y,s,c,I){ const R=Math.ceil(s*3), w=this.w, h=this.h, k=1/(2*s*s);
+    const x0=Math.max(0,Math.floor(x-R)), x1=Math.min(w-1,Math.ceil(x+R)), y0=Math.max(0,Math.floor(y-R)), y1=Math.min(h-1,Math.ceil(y+R));
+    for(let yy=y0;yy<=y1;yy++){ const dy=yy+.5-y; for(let xx=x0;xx<=x1;xx++){ const dx=xx+.5-x; const g=I*Math.exp(-(dx*dx+dy*dy)*k); if(g<1e-4) continue; const i=yy*w+xx; this.r[i]+=c[0]*g; this.g[i]+=c[1]*g; this.b[i]+=c[2]*g; } } }
+  add(i,c,I){ this.r[i]+=c[0]*I; this.g[i]+=c[1]*I; this.b[i]+=c[2]*I; }
+  star(x,y,L,t){ const u=this.u, c=starColor(t), s=Math.max(.5,(.5+.55*Math.sqrt(L))*u);
+    this.splat(x,y,s,c,L*1.3); if(L>.5) this.splat(x,y,s*3.6,c,L*.05);
+    if(L>1.3){ const len=Math.round(L*9*u), w=this.w, h=this.h, xi=Math.round(x), yi=Math.round(y);
+      for(let k=-len;k<=len;k++){ if(!k) continue; const f=L*.22*Math.pow(1-Math.abs(k)/len,2);
+        if(xi+k>=0&&xi+k<w&&yi>=0&&yi<h) this.add(yi*w+xi+k,c,f); if(yi+k>=0&&yi+k<h&&xi>=0&&xi<w) this.add((yi+k)*w+xi,c,f); } } }
+  bgStars(r,density){ const n=Math.round(this.w*this.h/900*density); for(let i=0;i<n;i++){ const L=.04+.55*Math.pow(r(),4); this.star(r()*this.w,r()*this.h,L,r()); } }
+  toCanvas(cv,exposure=1.25){ cv.width=this.w; cv.height=this.h; const ctx=cv.getContext("2d"), id=ctx.createImageData(this.w,this.h), d=id.data;
+    for(let i=0,j=0;i<this.r.length;i++,j+=4){ d[j]=255*Math.pow(1-Math.exp(-this.r[i]*exposure),.92); d[j+1]=255*Math.pow(1-Math.exp(-this.g[i]*exposure),.92); d[j+2]=255*Math.pow(1-Math.exp(-(this.b[i]*exposure+.012)),.92); d[j+3]=255; }
+    ctx.putImageData(id,0,0); }
+}
+const GEN={
+  open(B,P,r,N){ const {w,h}=B; B.bgStars(r,.7);
+    const cx=w*(.42+.16*r()), cy=h*(.42+.16*r()), R=w*(.14+.24*P.spread), n=Math.round(25+P.stars*190);
+    const clumps=[]; for(let i=0,k=3+(r()*3|0);i<k;i++) clumps.push([cx+(r()-.5)*R*1.1, cy+(r()-.5)*R*1.1]);
+    const bright=[];
+    if(P.gas>.05){ const sc=3/w, col=hueRGB(218,.8,.6); for(let i=0;i<5;i++) bright.push([cx+(r()-.5)*R*1.2, cy+(r()-.5)*R*1.2]);
+      for(let y=0;y<h;y++) for(let x=0;x<w;x++){ let il=0; for(const b of bright){ const dx=x-b[0], dy=y-b[1]; il+=Math.exp(-Math.sqrt(dx*dx+dy*dy)/(w*.07)); }
+        const d=Math.max(0,N.fbm(x*sc*.8,y*sc*2.6,5)-.35)*2.2; B.add(y*w+x,col,il*d*P.gas*.55); } }
+    for(let i=0;i<n;i++){ const c=r()<.75?clumps[(r()*clumps.length)|0]:[cx,cy]; const g1=(r()+r()+r()-1.5), g2=(r()+r()+r()-1.5);
+      let L=.15+2.4*Math.pow(r(),5), t=P.temp+(r()-.5)*.35; if(r()<.05){ t=.12; L+=.5; } B.star(c[0]+g1*R*.75,c[1]+g2*R*.75,L,t); }
+    for(const b of bright) B.star(b[0],b[1],1.6+r(),Math.min(1,P.temp+.1)); },
+  globular(B,P,r,N){ const {w,h}=B; B.bgStars(r,.6);
+    const cx=w*(.46+.08*r()), cy=h*(.46+.08*r()), a=w*(.025+.06*P.spread), n=Math.round(1200+P.stars*5200), maxR=w*.48, glowC=starColor(Math.max(.15,P.temp*.8));
+    for(let y=0;y<h;y++) for(let x=0;x<w;x++){ const dx=(x-cx)/a, dy=(y-cy)/a, q=1+dx*dx+dy*dy; B.add(y*w+x,glowC,(.35+P.stars*.5)/(q*q*Math.sqrt(q))); }
+    for(let i=0;i<n;i++){ const u=Math.max(1e-4,r()); const rr=a/Math.sqrt(Math.pow(u,-2/3)-1); if(rr>maxR) continue; const th=r()*Math.PI*2;
+      let L=.06+.55*Math.pow(r(),4), t=P.temp+(r()-.5)*.3; if(r()<.02){ L+=.7; t=.08; } else if(r()<.008){ t=.95; L+=.3; } B.star(cx+Math.cos(th)*rr,cy+Math.sin(th)*rr,L,t); } },
+  emission(B,P,r,N){ const {w,h}=B; B.bgStars(r,.8+P.stars*.6);
+    const cx=w*(.38+.24*r()), cy=h*(.38+.24*r()), Rn=w*(.22+.3*P.spread), base=hueRGB(P.hue,.85,.5), teal=[.3,.85,.8], sc=3.2/w, amp=.5+2.2*P.gas, ox=r()*50, oy=r()*50;
+    for(let y=0;y<h;y++) for(let x=0;x<w;x++){ const px=x*sc+ox, py=y*sc+oy, qx=N.fbm(px+1.7,py+9.2,4), qy=N.fbm(px+8.3,py+2.8,4), d=N.fbm(px+2.6*qx,py+2.6*qy,5);
+      const dx=(x-cx)/Rn, dy=(y-cy)/Rn, rr=Math.sqrt(dx*dx+dy*dy), m=smooth(1.2,.1,rr+(qx-.5)*1.1);
+      let den=m*Math.pow(Math.max(0,d-.28)*1.9,1.5)*amp; den*=1-.85*smooth(.5,.68,N.fbm(px*1.7+20,py*1.7+5,4));
+      const core=Math.exp(-rr*rr*7), i=y*w+x; B.add(i,base,den*(1-core*.5)); B.add(i,teal,den*core*.6); B.add(i,[1,.95,.9],den*core*.25); }
+    const k=3+(r()*7|0); for(let i=0;i<k;i++) B.star(cx+(r()-.5)*Rn*.3, cy+(r()-.5)*Rn*.3, .9+1.4*r(), .95); },
+  reflection(B,P,r,N){ const {w,h}=B; B.bgStars(r,.7+P.stars*.6);
+    const ns=1+(r()*3|0), S=[]; for(let i=0;i<ns;i++) S.push([w*(.3+.4*r()),h*(.3+.4*r())]);
+    const col=hueRGB(P.hue,.8,.58), sc=3/w, ang=r()*Math.PI, ca=Math.cos(ang), sa=Math.sin(ang), Ls=w*(.08+.14*P.spread), amp=.4+1.6*P.gas, ox=r()*40;
+    for(let y=0;y<h;y++) for(let x=0;x<w;x++){ let il=0; for(const s of S){ const dx=x-s[0], dy=y-s[1]; il+=Math.exp(-Math.sqrt(dx*dx+dy*dy)/Ls); }
+      const px=x*sc+ox, py=y*sc, u=px*ca+py*sa, v=-px*sa+py*ca, q=N.fbm(px+3.1,py+7.7,3);
+      let den=Math.pow(Math.max(0,N.fbm(u*.7+q*1.4,v*2.6,5)-.3)*1.8,1.3)*il*amp; den*=1-.6*smooth(.55,.7,N.fbm(px*1.5+9,py*1.5,4));
+      const i=y*w+x; B.add(i,col,den); B.add(i,[.9,.95,1],den*il*.25); }
+    for(const s of S) B.star(s[0],s[1],2+1.2*r(),.88); },
+  dark(B,P,r,N){ const {w,h}=B, variant=["blob","lane","edge"][(r()*3)|0];
+    const cx=w*(.4+.2*r()), cy=h*(.4+.2*r()), sc=3/w, ext=.6+.8*P.spread, ox=r()*30;
+    const milk=[1,.88,.72], mg=.04+.11*P.stars; for(let y=0;y<h;y++) for(let x=0;x<w;x++) B.add(y*w+x,milk,mg*(.5+N.fbm(x*sc*.7+40,y*sc*.7,4)));
+    const nb=Math.round(w*h/110*(.35+P.stars)); for(let i=0;i<nb;i++) B.star(r()*w,r()*h,.07+.8*Math.pow(r(),3),.25+.7*r());
+    const th=r()*Math.PI, st=Math.sin(th), ct=Math.cos(th), glow=hueRGB(355,.75,.45), op=new Float32Array(w*h);
+    for(let y=0;y<h;y++) for(let x=0;x<w;x++){ const px=x*sc+ox, py=y*sc, n=N.fbm(px+2*N.fbm(px+5,py,3),py+2*N.fbm(px,py+5,3),5); let o, i=y*w+x;
+      if(variant==="blob"){ const dx=(x-cx)/(w*.24*ext), dy=(y-cy)/(w*.24*ext); o=smooth(1,.45,Math.sqrt(dx*dx+dy*dy)+(n-.5)*1.4); }
+      else if(variant==="lane"){ const dd=Math.abs((x-cx)*st-(y-cy)*ct)/(w*.12*ext); o=smooth(1,.3,dd+(n-.5)*1.6); }
+      else { const s=((y-h*.55)+(n-.5)*w*.45)/(w*.05*ext); o=smooth(-.4,.9,s); B.add(i,glow,smooth(.9,-.1,s)*Math.pow(Math.max(0,n-.25)*1.7,1.3)*(.4+.5*P.gas)); }
+      op[i]=o*(.55+.45*P.gas)*(.8+.4*N.fbm(px*2,py*2,3)); }
+    for(let i=0;i<op.length;i++){ const t=Math.max(0,1-Math.min(1,op[i])*.985); B.r[i]*=t; B.g[i]*=t*.97; B.b[i]*=t*.93; }
+    const f=Math.round(w*h/9000); for(let i=0;i<f;i++) B.star(r()*w,r()*h,.1+.9*Math.pow(r(),3),r()); }
+};
+function render(P,cv,size){ const B=new Buf(size,size); GEN[P.type](B,P,rng(P.seed),makeNoise(rng(P.seed^0x9e3779b9))); B.toCanvas(cv); return cv; }
+let jobToken=0;
+function queue(jobs){ const tok=++jobToken; let i=0; (function step(){ if(tok!==jobToken) return; const t0=performance.now(); while(i<jobs.length && performance.now()-t0<30) jobs[i++](); if(i<jobs.length) setTimeout(step,0); })(); }
+
+/* ===================== 나만의 천체 ===================== */
+const DEFAULTS={ open:{stars:55,spread:50,temp:85,gas:0,hue:218}, globular:{stars:70,spread:40,temp:22,gas:0,hue:40}, emission:{stars:40,spread:60,temp:95,gas:70,hue:355}, reflection:{stars:40,spread:55,temp:88,gas:70,hue:218}, dark:{stars:60,spread:55,temp:50,gas:85,hue:355} };
+const SHOW={ open:["fStars","fSpread","fTemp","fGas"], globular:["fStars","fSpread","fTemp"], emission:["fStars","fSpread","fGas","fHue"], reflection:["fStars","fSpread","fGas","fHue"], dark:["fStars","fSpread","fGas"] };
+const CONSTS=["오리온자리","황소자리","백조자리","카시오페이아자리","큰곰자리","전갈자리","궁수자리","헤라클레스자리","거문고자리","페르세우스자리","사자자리","쌍둥이자리","안드로메다자리","나만의 상상 별자리"];
+const maker={
+  type:"emission", seed:20261005, timer:0, dex:[],
+  params(){ return {type:this.type,seed:this.seed,stars:$("#mStars").value/100,spread:$("#mSpread").value/100,temp:$("#mTemp").value/100,gas:$("#mGas").value/100,hue:+$("#mHue").value}; },
+  setType(t,reset=true){ this.type=t; [...$("#mTypes").children].forEach(b=>b.setAttribute("aria-pressed",b.dataset.t===t));
+    if(reset){ const d=DEFAULTS[t]; $("#mStars").value=d.stars; $("#mSpread").value=d.spread; $("#mTemp").value=d.temp; $("#mGas").value=d.gas; $("#mHue").value=d.hue; }
+    ["fStars","fSpread","fTemp","fGas","fHue"].forEach(id=>$("#"+id).hidden=!SHOW[t].includes(id)); this.update(); },
+  hueName(h){ return h<20||h>=330?"붉은색":h<50?"주황색":h<70?"노란색":h<165?"초록색":h<190?"청록색":h<255?"파란색":h<290?"보라색":"분홍색"; },
+  labels(){ const P=this.params(), T=this.type;
+    $("#vStars").textContent=T==="globular"?Math.round(1+P.stars*29)+"만 개":T==="open"?Math.round(30+P.stars*970)+"개":"배경 별 "+(P.stars<.34?"적음":P.stars<.67?"보통":"많음");
+    $("#vSpread").textContent=Math.round(P.spread*100)+"%";
+    $("#vTemp").textContent=P.temp<.3?"붉은색 · 약 3,500K":P.temp<.5?"주황·노란색 · 약 5,000K":P.temp<.7?"흰색 · 약 8,000K":"파란색 · 약 15,000K 이상";
+    $("#vGas").textContent=Math.round(P.gas*100)+"%"; $("#vHue").textContent=this.hueName(P.hue); },
+  checks(){ const P=this.params(), T=this.type, out=[], ok=t=>out.push([1,t]), tip=t=>out.push([0,t]); const red=P.hue<25||P.hue>=330, blue=P.hue>=195&&P.hue<255;
+    if(T==="open"){ P.temp>=.6?ok("젊고 뜨거운 파란 별이 많아요. 진짜 산개성단과 같아요."):tip("산개성단에는 젊은 별이 많아서 보통 파란색·흰색으로 보여요. 별의 색을 오른쪽으로 옮겨 보세요.");
+      P.stars<=.85?ok("별이 듬성듬성 모여 있어요."):tip("별이 너무 많아요. 산개성단은 수십~수만 개 정도예요."); if(P.gas>.05) ok("주변에 파란 반사성운이 생겼어요. 플레이아데스 성단처럼요!"); }
+    if(T==="globular"){ P.temp<=.45?ok("늙은 붉은 별이 많아요. 진짜 구상성단과 같아요."):tip("구상성단은 아주 오래된 별의 무리라서 붉은색·노란색 별이 많아요. 별의 색을 왼쪽으로 옮겨 보세요.");
+      P.stars>=.3?ok("수만 개가 넘는 별이 빽빽해요."):tip("구상성단은 별이 수만~수십만 개예요. 별의 수를 늘려 보세요."); P.spread<=.7?ok("가운데로 갈수록 빽빽한 공 모양이에요."):tip("너무 퍼지면 공 모양이 잘 안 보여요."); }
+    if(T==="emission"){ red?ok("붉은색이에요. 방출성운의 대표 색이에요."):blue?tip("파란 성운은 별빛을 반사하는 반사성운에서 주로 보여요. 방출성운은 주로 붉은색이에요."):tip("방출성운은 주로 붉은빛으로 보여요. 색을 붉은색 쪽으로 옮겨 보세요.");
+      P.gas>=.35?ok("가스가 충분해서 밝게 빛나요."):tip("가스가 적어 성운이 흐려요. 가스·먼지의 양을 늘려 보세요."); ok("가운데의 뜨거운 별이 성운에 에너지를 주고 있어요."); }
+    if(T==="reflection"){ blue?ok("파란색이에요. 파란빛이 잘 반사되어 반사성운은 파랗게 보여요."):red?tip("붉게 빛나는 성운은 방출성운이에요. 반사성운은 주로 파란색이에요."):tip("반사성운은 별빛 중 파란빛이 잘 반사되어 주로 파란색으로 보여요.");
+      P.gas>=.35?ok("먼지가 충분해서 별빛이 잘 반사돼요."):tip("먼지가 적어서 반사되는 빛이 약해요."); ok("가까이에 밝은 별이 있어야 반사성운이 보여요."); }
+    if(T==="dark"){ P.gas>=.5?ok("가스와 먼지가 빽빽해서 뒤쪽 별빛을 잘 가려요."):tip("가스·먼지가 적으면 별빛을 다 가리지 못해요. 양을 늘려 보세요.");
+      P.stars>=.3?ok("뒤쪽 별이 많아서 검은 성운이 잘 드러나요."):tip("암흑성운은 뒤쪽에 별이 많아야 잘 보여요. 별의 수를 늘려 보세요."); }
+    const d=+$("#mDist").value; if(d>100000) tip("성단과 성운은 우리은하 안에 있어요. 우리은하의 지름은 약 10만 광년이에요."); else if(d>0) ok("거리가 우리은하 안이에요.");
+    $("#mName").value.trim()?ok("멋진 이름이 있어요."):tip("천체의 이름을 지어 주세요."); return out; },
+  drawChecks(){ $("#mChecks").innerHTML=this.checks().map(([o,t])=>`<div class="${o?"ok":"tip"}"><span>${o?"✓":"!"}</span><span>${t}</span></div>`).join(""); },
+  update(){ this.labels(); this.drawChecks(); clearTimeout(this.timer); this.timer=setTimeout(()=>this.draw(),60); },
+  draw(){ render(this.params(),$("#mCanvas"),480); },
+  meta(){ return {name:$("#mName").value.trim()||"이름 없는 천체", cons:$("#mConst").value, dist:+$("#mDist").value||0, desc:$("#mDesc").value.trim(), by:$("#mMaker").value.trim()}; },
+  card(P,M){ const W=720,H=1040, c=el("canvas"); c.width=W; c.height=H; const x=c.getContext("2d");
+    const bg=x.createLinearGradient(0,0,0,H); bg.addColorStop(0,"#2a2468"); bg.addColorStop(1,"#15123b"); x.fillStyle=bg; x.fillRect(0,0,W,H);
+    x.strokeStyle="#ffd166"; x.lineWidth=6; x.beginPath(); x.roundRect(14,14,W-28,H-28,30); x.stroke();
+    const img=el("canvas"); render(P,img,640); x.save(); x.beginPath(); x.roundRect(40,40,640,640,24); x.clip(); x.drawImage(img,40,40,640,640); x.restore();
+    const F='"Malgun Gothic","맑은 고딕",sans-serif'; x.textBaseline="top";
+    x.fillStyle="#c3bbef"; x.font="bold 20px "+F; x.fillText("MY-"+String(P.seed%10000).padStart(4,"0")+"  ·  나만의 천체 카드",40,702);
+    x.fillStyle="#fbf8ff"; x.font="900 46px "+F; x.fillText(M.name,40,734);
+    const tc={open:"#7ef0d0",globular:"#ffd166",emission:"#ff7b9c",reflection:"#7cc4ff",dark:"#c2b2ec"}[P.type];
+    x.font="bold 24px "+F; const tl=TYPES[P.type].group+" · "+TYPES[P.type].name, tw=x.measureText(tl).width;
+    x.fillStyle=tc; x.beginPath(); x.roundRect(40,802,tw+28,40,20); x.fill(); x.fillStyle="#221a4d"; x.fillText(tl,54,809);
+    x.fillStyle="#c3bbef"; x.font="22px "+F; x.fillText(`${M.cons}  ·  지구에서 ${M.dist.toLocaleString("ko-KR")}광년`,tw+90,810);
+    x.fillStyle="#fbf8ff"; x.font="23px "+F; let line="", lines=[];
+    for(const ch of M.desc){ if(x.measureText(line+ch).width>640){ lines.push(line); line=ch; } else line+=ch; } if(line) lines.push(line);
+    lines.slice(0,4).forEach((l,i)=>x.fillText(l,40,866+i*34));
+    x.fillStyle="#ffd166"; x.font="bold 22px "+F; x.fillText("발견자  "+(M.by||"-"),40,H-64); return c; },
+  loadDex(){ this.dex=store.get("nebula-lab-dex",[]); this.drawDex(); },
+  drawDex(){ const g=$("#dexGrid"); g.innerHTML=""; $("#dexCount").textContent=this.dex.length?this.dex.length+"개 발견":"";
+    if(!this.dex.length){ g.append(el("div",{class:"dex-empty",style:"grid-column:1/-1"},"아직 발견한 천체가 없어요. 위에서 천체를 만들고 <b>내 도감에 추가</b>를 누르면 여기에 모여요. (이 컴퓨터의 브라우저에 저장돼요)")); return; }
+    const jobs=[];
+    this.dex.forEach((d,i)=>{ const card=el("div",{class:"gcard dexcard",role:"button",tabindex:"0"}); const cv=el("canvas",{class:"sky",width:200,height:200});
+      const nm=el("div",{class:"nm"}); nm.textContent=d.M.name; const meta=el("div",{class:"meta"},chip(d.P.type));
+      const x=el("button",{class:"x",type:"button","aria-label":"삭제"},"삭제"); x.addEventListener("click",e=>{ e.stopPropagation(); this.dex.splice(i,1); store.set("nebula-lab-dex",this.dex); this.drawDex(); }); meta.append(x);
+      card.addEventListener("click",()=>openCard(this.card(d.P,d.M),d.M.name)); card.append(cv,nm,meta); g.append(card); jobs.push(()=>render(d.P,cv,200)); });
+    queue(jobs); },
+  init(){ const T=$("#mTypes");
+    ORDER.forEach(t=>{ const b=el("button",{type:"button",class:TYPES[t].cls},`<span>${TYPES[t].name}</span>`); b.dataset.t=t; b.addEventListener("click",()=>this.setType(t)); T.append(b); });
+    const cs=$("#mConst"); CONSTS.forEach(c=>cs.append(el("option",{value:c},c))); cs.value="오리온자리";
+    ["mStars","mSpread","mTemp","mGas","mHue"].forEach(id=>$("#"+id).addEventListener("input",()=>this.update()));
+    ["mName","mDist"].forEach(id=>$("#"+id).addEventListener("input",()=>this.drawChecks()));
+    $("#mDice").addEventListener("click",()=>{ this.seed=(Math.random()*1e9)|0; this.draw(); mood($("#mascotTop"),"happy"); });
+    $("#mCard").addEventListener("click",()=>{ const M=this.meta(); openCard(this.card(this.params(),M),M.name); });
+    $("#mSave").addEventListener("click",e=>{ this.dex.unshift({P:this.params(),M:this.meta()}); const saved=store.set("nebula-lab-dex",this.dex); this.drawDex();
+      toast(saved?"내 도감에 추가했어요!":"도감에 추가했어요 (창을 닫으면 사라져요)"); const r=e.target.getBoundingClientRect(); confetti(r.left+r.width/2,r.top,50); mood($("#mascotTop"),"happy"); });
+    this.setType("emission",true); this.loadDex(); }
+};
+
+/* ===================== 시작 ===================== */
+maker.init();
+const guide=$("#guide");
+function openGuide(){ guide.hidden=false; $("#gdGame").focus(); }
+function closeGuide(tab){ guide.hidden=true; store.set("nebula-guide",1); if(tab){ showTab(tab); scrollTo({top:0,behavior:"smooth"}); } }
+$("#helpBtn").addEventListener("click",openGuide);
+$("#gdLearn").addEventListener("click",()=>closeGuide("learn"));
+$("#gdGame").addEventListener("click",()=>closeGuide("game"));
+guide.addEventListener("click",e=>{ if(e.target===guide) closeGuide(); });
+document.addEventListener("keydown",e=>{ if(e.key==="Escape" && !guide.hidden) closeGuide(); });
+const first=location.hash.slice(1);
+showTab(["learn","game","gallery","make"].includes(first)?first:"learn");
+if(!first && !store.get("nebula-guide",0)) openGuide();
+</script>
+</body>
+</html>
