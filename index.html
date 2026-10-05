@@ -287,6 +287,42 @@ textarea{resize:vertical;min-height:70px}
 .tipbox{background:#ffd16622;border-radius:14px;padding:10px 14px;font-size:.9rem}
 .dnaimg{width:min(480px,100%);border-radius:18px;box-shadow:0 8px 0 #0004}
 .dnanav{justify-content:flex-end}
+/* 사진 탐구 */
+.xtop{display:grid;gap:12px}
+.xhint{display:flex;gap:14px;align-items:center}
+.xhint .mascot{width:64px;height:64px}
+.xhint p{font-size:1.02rem}
+.xzone{display:grid;gap:10px;align-content:start;transition:box-shadow .15s}
+.xzone.over{box-shadow:0 8px 0 #0003,0 0 0 4px var(--yellow)}
+.xlab{font-weight:800}
+.xtiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px;min-height:60px}
+.xgroups{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:14px}
+.xgroup{cursor:pointer}
+.xghead{display:flex;gap:8px;align-items:center}
+.xghead input{flex:1;min-width:0;font-weight:800}
+.xnum{width:32px;height:32px;flex:none;border-radius:50%;background:var(--pink);color:#3a1034;display:grid;place-items:center;font-weight:900}
+.xghead .x{background:none;border:0;color:var(--dim);cursor:pointer;font-size:1rem}
+.xgroup textarea{min-height:56px;font-size:.9rem}
+.xempty{grid-column:1/-1;color:var(--dim);font-size:.85rem;border:2px dashed var(--line);border-radius:12px;padding:14px;text-align:center}
+.xtile{position:relative;border-radius:14px;cursor:grab;transition:transform .15s;outline:3px solid transparent;touch-action:manipulation}
+.xtile .photo{border-radius:12px}
+.xtile:hover{transform:translateY(-2px) rotate(-1deg)}
+.xtile.sel{outline-color:var(--yellow);transform:scale(1.05);box-shadow:0 0 20px #ffd16688}
+.xzoom{position:absolute;right:4px;top:4px;width:28px;height:28px;border-radius:50%;border:0;background:#000a;color:#fff;cursor:pointer;font-size:.8rem;line-height:1}
+.xchip{position:absolute;left:4px;bottom:4px}
+.xchip .chip{font-size:.68rem;padding:1px 7px}
+.xsum{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:.85rem}
+#xReveal.dim{opacity:.6}
+.xsci{display:grid;gap:14px;animation:pop-in .4s}
+.xtree{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,3fr);gap:14px}
+@media (max-width:760px){.xtree{grid-template-columns:1fr}}
+.xbranch{background:#ffffff0d;border-radius:18px;padding:12px;display:grid;gap:10px;align-content:start}
+.xbig{font-size:1.3rem;font-weight:900;text-align:center}
+.xleaf{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px}
+.xl{display:grid;gap:6px;justify-items:start}
+.xl small{color:var(--mute);font-size:.78rem}
+.xmini{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;width:100%}
+.xmini .photo{border-radius:8px}
 #confetti{position:fixed;inset:0;z-index:55;pointer-events:none}
 .helpbtn{margin-left:auto;flex:none}
 .bubble+.helpbtn{margin-left:0}
@@ -339,7 +375,8 @@ footer{position:relative;z-index:1;color:var(--dim);font-size:.8rem;max-width:11
 
 <nav class="tabs" aria-label="메뉴">
   <div class="in" role="tablist">
-    <button role="tab" data-tab="learn" aria-selected="true">개념 익히기</button>
+    <button role="tab" data-tab="explore" aria-selected="true">사진 탐구</button>
+    <button role="tab" data-tab="learn" aria-selected="false">개념 익히기</button>
     <button role="tab" data-tab="game" aria-selected="false">분류 게임</button>
     <button role="tab" data-tab="gallery" aria-selected="false">NASA 사진 도감</button>
     <button role="tab" data-tab="dna" aria-selected="false">우주 DNA 포스터</button>
@@ -350,11 +387,20 @@ footer{position:relative;z-index:1;color:var(--dim);font-size:.8rem;max-width:11
 <div class="wrap">
 
 <!-- ============ 개념 익히기 ============ -->
-<section class="page" id="tab-learn">
+<section class="page" id="tab-explore">
+  <div style="display:grid;gap:8px">
+    <h2>사진 탐구 · 나만의 기준으로 나누기</h2>
+    <p class="lead">아직 이름은 몰라도 괜찮아요. NASA 우주 사진 12장을 잘 살펴보고 <b>비슷한 것끼리</b> 무리로 나눠 봐요. 무리마다 이름과 <b>나눈 기준</b>을 적은 뒤, 과학자의 분류와 비교해요.</p>
+  </div>
+  <div id="explore" style="display:grid;gap:14px"></div>
+</section>
+
+<section class="page" id="tab-learn" hidden>
   <div class="two">
     <article class="card concept">
       <span class="kicker">NEBULA</span>
       <h2>성운 · 가스와 먼지의 구름</h2>
+      <p class="lead" style="font-size:.88rem">사진 탐구에서 '구름처럼 퍼진 것'으로 나눈 사진들이 바로 성운이에요.</p>
       <p class="def">별과 별 사이의 <b>가스와 티끌(성간 물질)</b>이 많이 모여 <b>구름처럼</b> 보이는 것이에요. 빛을 내는 방법에 따라 세 가지로 나눠요.</p>
       <div class="duo">
         <figure data-k="ae10"><div class="photo"></div><figcaption><span class="chip t-emission"><span>방출성운</span></span>스스로 빛나요</figcaption></figure>
@@ -391,6 +437,7 @@ footer{position:relative;z-index:1;color:var(--dim);font-size:.8rem;max-width:11
     <article class="card concept">
       <span class="kicker">STAR CLUSTER</span>
       <h2>성단 · 별들의 무리</h2>
+      <p class="lead" style="font-size:.88rem">사진 탐구에서 '점이 모인 것'으로 나눈 사진들이 바로 성단이에요.</p>
       <p class="def">많은 별이 <b>좁은 공간에 모여 무리</b>를 이룬 것이에요. 사진에서 <b>별 하나하나가 점</b>으로 보여요.</p>
       <div class="duo">
         <figure data-k="ao9"><div class="photo"></div><figcaption><span class="chip t-open"><span>산개성단</span></span>듬성듬성, 불규칙</figcaption></figure>
@@ -524,15 +571,17 @@ footer{position:relative;z-index:1;color:var(--dim);font-size:.8rem;max-width:11
     <h3 id="gdTitle">반가워! 성운·성단 관측소야</h3>
     <p class="lead">위쪽 메뉴 버튼을 눌러서 차례대로 해 봐요.</p>
     <ol class="steps">
-      <li><span class="n">1</span><div><b>개념 익히기</b><small>성운 3가지, 성단 2가지를 NASA 사진으로 배워요.</small></div></li>
-      <li><span class="n">2</span><div><b>분류 게임</b><small>사진을 보고 알맞은 상자를 골라요. 결과 화면을 캡처해서 패들렛에 올려요.</small></div></li>
-      <li><span class="n">3</span><div><b>NASA 사진 도감</b><small>진짜 우주 사진 89장을 이름을 가리고 맞혀 봐요.</small></div></li>
-      <li><span class="n">4</span><div><b>우주 DNA 포스터</b><small>설문으로 나의 우주 DNA를 만들고 AI 그림·포스터 프롬프트를 받아요.</small></div></li>
-      <li><span class="n">5</span><div><b>나만의 천체 만들기</b><small>나만의 성운이나 성단을 만들고 천체 카드를 패들렛에 올려요.</small></div></li>
+      <li><span class="n">1</span><div><b>사진 탐구</b><small>이름을 모르는 NASA 사진을 나만의 기준으로 나눠 봐요.</small></div></li>
+      <li><span class="n">2</span><div><b>개념 익히기</b><small>성운 3가지, 성단 2가지를 NASA 사진으로 배워요.</small></div></li>
+      <li><span class="n">3</span><div><b>분류 게임</b><small>사진을 보고 알맞은 상자를 골라요. 결과 화면을 캡처해서 패들렛에 올려요.</small></div></li>
+      <li><span class="n">4</span><div><b>NASA 사진 도감</b><small>진짜 우주 사진 89장을 이름을 가리고 맞혀 봐요.</small></div></li>
+      <li><span class="n">5</span><div><b>우주 DNA 포스터</b><small>설문으로 나의 우주 DNA를 만들고 AI 그림·포스터 프롬프트를 받아요.</small></div></li>
+      <li><span class="n">6</span><div><b>나만의 천체 만들기</b><small>나만의 성운이나 성단을 만들고 천체 카드를 패들렛에 올려요.</small></div></li>
     </ol>
     <div class="actions">
       <button class="btn" id="gdLearn" type="button">개념부터 볼래요</button>
-      <button class="btn yellow" id="gdGame" type="button">게임 바로 하기</button>
+      <button class="btn yellow" id="gdExplore" type="button">사진 탐구부터 시작</button>
+      <button class="btn" id="gdGame" type="button">게임 바로 하기</button>
     </div>
   </div>
 </div>
@@ -640,12 +689,13 @@ const confetti=(function(){
 
 /* ===================== 라이트박스 ===================== */
 let modalDl=null;
-function openPhoto(p){
+function openPhoto(p,opt={}){
   $("#mdImg").src=p.img; $("#mdImg").alt=p.name; $("#mdImg").onerror=function(){ if(this.src!==p.th) this.src=p.th; };
   $("#mdChip").innerHTML=chip(p.t); $("#mdTitle").textContent=p.name;
   $("#mdNote").textContent=(p.note?p.note+" ":"")+TYPES[p.t].clue;
   $("#mdSrc").textContent=credit(p);
   const a=$("#mdLink"); a.hidden=false; a.href=p.src; $("#mdDl").hidden=true; modalDl=null;
+  if(opt.plain){ $("#mdChip").innerHTML=""; $("#mdTitle").textContent="어떤 천체일까요?"; $("#mdNote").textContent="점이 모여 있나요, 구름처럼 퍼져 있나요? 색과 모양도 살펴봐요."; a.hidden=true; }
   $("#modal").hidden=false; $("#mdClose").focus();
 }
 function openCard(cv,name){
@@ -660,7 +710,7 @@ $("#mdDl").addEventListener("click",()=>{ if(!modalDl) return; const a=el("a",{h
 
 /* ===================== 탭 ===================== */
 const tabs=[...document.querySelectorAll("nav.tabs button")];
-const TALK={dna:"설문에 답하면 너만의 우주 DNA가 생겨!",learn:"성운은 가스와 먼지의 구름, 성단은 별의 무리야!",game:"사진을 보고 알맞은 상자에 쏙 넣어 줘!",gallery:"진짜 NASA 사진이야. 이름을 가리고 맞혀 볼래?",make:"세상에 하나뿐인 천체를 만들어 보자!"};
+const TALK={explore:"이름은 몰라도 괜찮아! 비슷한 것끼리 나눠 봐!",dna:"설문에 답하면 너만의 우주 DNA가 생겨!",learn:"성운은 가스와 먼지의 구름, 성단은 별의 무리야!",game:"사진을 보고 알맞은 상자에 쏙 넣어 줘!",gallery:"진짜 NASA 사진이야. 이름을 가리고 맞혀 볼래?",make:"세상에 하나뿐인 천체를 만들어 보자!"};
 function showTab(name){
   tabs.forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===name));
   document.querySelectorAll("section.page").forEach(s=>s.hidden=s.id!=="tab-"+name);
@@ -669,6 +719,7 @@ function showTab(name){
   if(name==="game" && !game.ready) game.home();
   if(name==="make") maker.draw();
   if(name==="dna") dna.render();
+  if(name==="explore") explore.render();
   store.set("nebula-tab",name);
 }
 tabs.forEach(b=>b.addEventListener("click",()=>showTab(b.dataset.tab)));
@@ -1008,6 +1059,131 @@ const maker={
     this.setType("emission",true); this.loadDex(); }
 };
 
+/* ===================== 사진 탐구 (나만의 기준으로 나누기) ===================== */
+const EXPLORE_SET=["ao9","ao19","ao48","ag7","ag10","ae10","ae3","messier-42","ar24","ar60","ad87","ad93"];
+const explore={
+  st:null, sel:null,
+  fresh(set){ return {set:set||EXPLORE_SET.slice(),place:{},groups:[{name:"",crit:""},{name:"",crit:""}],revealed:false,note:""}; },
+  load(){ const v=store.get("nebula-explore",null); this.st=(v&&Array.isArray(v.set)&&v.set.every(k=>BYK[k]))?v:this.fresh(); },
+  save(){ store.set("nebula-explore",this.st); },
+  randomSet(){ const want={open:3,globular:2,emission:3,reflection:2,dark:2}, out=[];
+    ORDER.forEach(t=>out.push(...shuffle(PLAY.filter(p=>p.t===t)).slice(0,want[t]).map(p=>p.k))); return shuffle(out); },
+  where(k){ const g=this.st.place[k]; return g===undefined?-1:g; },
+  render(){
+    if(!this.st) this.load();
+    const st=this.st, box=$("#explore"); box.innerHTML="";
+    const placed=st.set.filter(k=>this.where(k)>=0).length;
+    // 안내
+    const used=st.groups.length;
+    const hint=st.revealed?"과학자의 분류와 내 분류를 비교해 봐요. 같은 점과 다른 점은 무엇일까요?"
+      :placed<st.set.length?(used<=2?"<b>1단계</b> 가장 크게 다른 점을 찾아 사진을 <b>두 무리</b>로 나눠 봐요. 사진을 누른 뒤 무리 상자를 누르면 들어가요.":"<b>2단계</b> 무리를 더 잘게 나눴어요. 남은 사진도 알맞은 무리에 넣어요.")
+      :"모두 나눴어요! 무리마다 <b>이름</b>과 <b>나눈 기준</b>을 적고, 더 나눌 수 있으면 <b>+ 무리 추가</b>를 눌러 봐요.";
+    const top=el("div",{class:"card xtop"});
+    top.innerHTML=`<div class="xhint">${mascotSVG("mascotX")}<p>${hint}</p></div>`;
+    const tb=el("div",{class:"actions"});
+    if(!st.revealed){
+      const add=el("button",{class:"btn",type:"button"},"+ 무리 추가"); add.disabled=st.groups.length>=6;
+      add.addEventListener("click",()=>{ st.groups.push({name:"",crit:""}); this.save(); this.render(); }); tb.append(add);
+    }
+    const other=el("button",{class:"btn",type:"button"},"다른 사진으로 바꾸기"); other.addEventListener("click",()=>{ this.st=this.fresh(this.randomSet()); this.sel=null; this.save(); this.render(); });
+    const reset=el("button",{class:"btn",type:"button"},"처음부터"); reset.addEventListener("click",()=>{ this.st=this.fresh(st.set); this.sel=null; this.save(); this.render(); });
+    tb.append(other,reset); top.append(tb); box.append(top);
+    // 아직 나누지 않은 사진
+    const rest=st.set.filter(k=>this.where(k)<0);
+    if(rest.length||!st.revealed){
+      const tray=el("div",{class:"card xzone xtray","data-zone":"-1"});
+      tray.append(el("p",{class:"xlab"},`아직 나누지 않은 사진 <span class="mono">${rest.length}장</span>`));
+      const g=el("div",{class:"xtiles"}); rest.forEach(k=>g.append(this.tile(k))); tray.append(g);
+      if(!rest.length) tray.append(el("p",{class:"lead",style:"font-size:.85rem"},"사진을 여기로 옮기면 무리에서 빠져요."));
+      box.append(tray);
+    }
+    // 무리들
+    const gw=el("div",{class:"xgroups"});
+    st.groups.forEach((gr,i)=>{
+      const card=el("div",{class:"card xzone xgroup","data-zone":String(i)});
+      const head=el("div",{class:"xghead"});
+      head.innerHTML=`<span class="xnum">${i+1}</span><input type="text" maxlength="14" placeholder="무리 이름 (예: 구름 무리)" aria-label="무리 ${i+1} 이름">`;
+      const nm=head.querySelector("input"); nm.value=gr.name; nm.disabled=st.revealed; nm.addEventListener("input",()=>{ gr.name=nm.value; this.save(); this.checkReady(); });
+      const mine=st.set.filter(k=>this.where(k)===i);
+      if(!st.revealed&&st.groups.length>2&&!mine.length){ const x=el("button",{class:"x",type:"button","aria-label":"무리 지우기"},"✕"); x.addEventListener("click",()=>{ st.groups.splice(i,1); for(const k in st.place){ if(st.place[k]>i) st.place[k]--; } this.save(); this.render(); }); head.append(x); }
+      const crit=el("textarea",{rows:"2",maxlength:"60",placeholder:"나눈 기준: 예) 작은 점들이 모여 있어요","aria-label":`무리 ${i+1} 기준`}); crit.value=gr.crit; crit.disabled=st.revealed;
+      crit.addEventListener("input",()=>{ gr.crit=crit.value; this.save(); this.checkReady(); });
+      const tiles=el("div",{class:"xtiles"}); mine.forEach(k=>tiles.append(this.tile(k)));
+      if(!mine.length) tiles.append(el("p",{class:"xempty"},"사진을 누른 뒤 여기를 눌러요"));
+      card.append(head,crit,tiles);
+      if(st.revealed&&mine.length){ const cnt={}; mine.forEach(k=>cnt[BYK[k].t]=(cnt[BYK[k].t]||0)+1);
+        card.append(el("div",{class:"xsum"},Object.entries(cnt).map(([t,n])=>`${chip(t)} <span class="mono">${n}</span>`).join(" "))); }
+      gw.append(card);
+    });
+    box.append(gw);
+    box.querySelectorAll("[data-zone]").forEach(z=>z.addEventListener("click",e=>{ if(e.target.closest("button,input,textarea")) return; if(this.sel) this.move(this.sel,+z.dataset.zone); }));
+    // 비교하기
+    if(!st.revealed){
+      const go=el("button",{class:"btn yellow",type:"button",id:"xReveal",style:"justify-self:center;font-size:1.1rem;padding:14px 26px"},"과학자의 분류와 비교하기");
+      go.addEventListener("click",()=>{ const r=this.ready(); if(r!==true){ toast(r); mood($("#mascotTop"),"sad"); return; } st.revealed=true; this.sel=null; this.save(); this.render();
+        const b=$("#xSci")?.getBoundingClientRect(); confetti(innerWidth/2,b?Math.max(120,b.top):200,100); mood($("#mascotTop"),"happy"); say("과학자들은 어떻게 나눴는지 볼까?"); });
+      box.append(go); this.checkReady();
+    } else box.append(this.sci());
+  },
+  tile(k){
+    const p=BYK[k], st=this.st;
+    const t=el("div",{class:"xtile"+(this.sel===k?" sel":""),role:"button",tabindex:"0","aria-label":"우주 사진"});
+    const ph=photoBox(p,{cap:false}); t.append(ph);
+    const z=el("button",{class:"xzoom",type:"button","aria-label":"크게 보기"},"🔍"); z.addEventListener("click",e=>{ e.stopPropagation(); openPhoto(p,{plain:!st.revealed}); }); t.append(z);
+    if(st.revealed) t.append(el("span",{class:"xchip"},chip(p.t)));
+    if(!st.revealed){
+      t.addEventListener("click",e=>{ e.stopPropagation(); this.sel=this.sel===k?null:k; this.render(); if(this.sel) say("어느 무리에 넣을까? 무리 상자를 눌러 줘!"); });
+      t.addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); t.click(); } });
+      this.drag(t,k);
+    }
+    return t;
+  },
+  drag(t,k){
+    let ghost=null, sx=0, sy=0, moved=false;
+    t.addEventListener("pointerdown",e=>{ if(e.button||e.target.closest(".xzoom")) return; sx=e.clientX; sy=e.clientY; moved=false;
+      const mv=ev=>{ if(!moved&&Math.hypot(ev.clientX-sx,ev.clientY-sy)<8) return;
+        if(!moved){ moved=true; ghost=el("div",{class:"ghost"}); ghost.append(t.querySelector("img").cloneNode()); document.body.append(ghost); }
+        ghost.style.left=ev.clientX+"px"; ghost.style.top=ev.clientY+"px";
+        document.querySelectorAll(".xzone.over").forEach(z=>z.classList.remove("over"));
+        document.elementFromPoint(ev.clientX,ev.clientY)?.closest("[data-zone]")?.classList.add("over"); };
+      const up=ev=>{ removeEventListener("pointermove",mv); removeEventListener("pointerup",up);
+        if(!moved) return; ghost?.remove(); document.querySelectorAll(".xzone.over").forEach(z=>z.classList.remove("over"));
+        const z=document.elementFromPoint(ev.clientX,ev.clientY)?.closest("[data-zone]"); t._skip=true; if(z) this.move(k,+z.dataset.zone); };
+      addEventListener("pointermove",mv); addEventListener("pointerup",up); });
+    t.addEventListener("click",e=>{ if(t._skip){ t._skip=false; e.stopImmediatePropagation(); } },true);
+  },
+  move(k,g){ if(g<0) delete this.st.place[k]; else this.st.place[k]=g; this.sel=null; this.save(); this.render(); },
+  ready(){ const st=this.st, left=st.set.filter(k=>this.where(k)<0).length;
+    if(left) return `아직 나누지 않은 사진이 ${left}장 있어요.`;
+    const used=st.groups.map((g,i)=>({g,i})).filter(({i})=>st.set.some(k=>this.where(k)===i));
+    if(used.length<2) return "적어도 두 무리로 나눠 주세요.";
+    const no=used.find(({g})=>!g.name.trim()||!g.crit.trim()); if(no) return `${no.i+1}번 무리의 이름과 기준을 적어 주세요.`;
+    return true; },
+  checkReady(){ const b=$("#xReveal"); if(b) b.classList.toggle("dim",this.ready()!==true); },
+  sci(){
+    const box=el("div",{class:"card xsci",id:"xSci"});
+    box.innerHTML=`<span class="kicker" style="font-weight:900;letter-spacing:.08em;color:var(--yellow)">과학자의 분류</span><h2>과학자들은 이렇게 나눠요</h2>
+      <p class="lead">먼저 <b>별이 점으로 모여 있는지(성단)</b>, <b>구름처럼 퍼져 있는지(성운)</b>로 크게 나눠요. 그다음 성단은 <b>모양과 별의 색</b>으로, 성운은 <b>빛을 내는 방식</b>으로 다시 나눠요.</p>`;
+    const tree=el("div",{class:"xtree"});
+    [["성단",["open","globular"]],["성운",["emission","reflection","dark"]]].forEach(([g,ts])=>{
+      const col=el("div",{class:"xbranch"}); col.append(el("p",{class:"xbig"},g));
+      const row=el("div",{class:"xleaf"});
+      ts.forEach(t=>{ const ks=this.st.set.filter(k=>BYK[k].t===t); const c=el("div",{class:"xl"}); c.innerHTML=chip(t)+`<small>${TYPES[t].short}</small>`;
+        const th=el("div",{class:"xmini"}); ks.forEach(k=>th.append(photoBox(BYK[k],{cap:false}))); c.append(th); row.append(c); });
+      col.append(row); tree.append(col); });
+    box.append(tree);
+    const f=el("div",{class:"field"},`<label for="xNote">내 분류와 과학자의 분류, 같은 점과 다른 점은?</label><textarea id="xNote" rows="3" maxlength="200" placeholder="예) 나도 점이 모인 것과 구름을 나눴어요. 하지만 구름을 색으로만 나눠서 암흑성운을 따로 생각하지 못했어요."></textarea>`);
+    box.append(f);
+    box.querySelector("#xNote").value=this.st.note||""; box.querySelector("#xNote").addEventListener("input",e=>{ this.st.note=e.target.value; this.save(); });
+    const act=el("div",{class:"actions"});
+    const go=el("button",{class:"btn yellow",type:"button"},"개념 익히러 가기"); go.addEventListener("click",()=>{ showTab("learn"); scrollTo({top:0,behavior:"smooth"}); });
+    const again=el("button",{class:"btn",type:"button"},"다시 나눠 보기"); again.addEventListener("click",()=>{ this.st.revealed=false; this.save(); this.render(); });
+    act.append(go,again); box.append(act);
+    box.append(el("p",{class:"lead",style:"font-size:.88rem"},"이 화면을 캡처해서 패들렛에 올리고, 우리 모둠의 분류 기준을 발표해 봐요."));
+    return box;
+  }
+};
+
 /* ===================== 우주 DNA 포스터 (8단계) ===================== */
 const DNA_STEPS=["활동 안내","복습·설문","우주 DNA","천체 고르기","이미지 프롬프트","작품 제목","포스터 프롬프트"];
 const DNA_FN=["s1","s3","s4","s5","s6","s7","s8"];
@@ -1289,15 +1465,16 @@ function copyText(ta){
 /* ===================== 시작 ===================== */
 maker.init();
 const guide=$("#guide");
-function openGuide(){ guide.hidden=false; $("#gdGame").focus(); }
+function openGuide(){ guide.hidden=false; $("#gdExplore").focus(); }
 function closeGuide(tab){ guide.hidden=true; store.set("nebula-guide",1); if(tab){ showTab(tab); scrollTo({top:0,behavior:"smooth"}); } }
 $("#helpBtn").addEventListener("click",openGuide);
 $("#gdLearn").addEventListener("click",()=>closeGuide("learn"));
 $("#gdGame").addEventListener("click",()=>closeGuide("game"));
+$("#gdExplore").addEventListener("click",()=>closeGuide("explore"));
 guide.addEventListener("click",e=>{ if(e.target===guide) closeGuide(); });
 document.addEventListener("keydown",e=>{ if(e.key==="Escape" && !guide.hidden) closeGuide(); });
 const first=location.hash.slice(1);
-showTab(["learn","game","gallery","dna","make"].includes(first)?first:"learn");
+showTab(["explore","learn","game","gallery","dna","make"].includes(first)?first:"explore");
 if(!first && !store.get("nebula-guide",0)) openGuide();
 </script>
 </body>
