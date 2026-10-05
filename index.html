@@ -229,6 +229,64 @@ textarea{resize:vertical;min-height:70px}
 .dex-empty{color:var(--mute);border:3px dashed var(--line);border-radius:var(--r);padding:22px;text-align:center}
 .dexcard .x{background:none;border:0;color:var(--dim);cursor:pointer;font-size:.8rem}
 .dexcard .x:hover{color:var(--bad)}
+/* 우주 DNA */
+.stepper{display:flex;gap:6px;overflow-x:auto;list-style:none;padding:0 0 6px;margin:0;scrollbar-width:none}
+.stepper li{flex:1 0 auto}
+.stepper button{width:100%;border:0;background:var(--card);color:var(--dim);border-radius:14px;padding:8px 10px;display:grid;justify-items:center;gap:2px;cursor:pointer;box-shadow:0 4px 0 #0003}
+.stepper button span{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:#ffffff14;font-weight:900}
+.stepper button small{font-size:.72rem;font-weight:700;white-space:nowrap}
+.stepper li.done button{color:var(--mute)} .stepper li.done button span{background:var(--mint);color:#1a1440}
+.stepper li.now button{background:var(--yellow);color:#2b2250} .stepper li.now button span{background:#2b2250;color:var(--yellow)}
+.stepper button:disabled{opacity:.45;cursor:default}
+.dnacard{display:grid;gap:16px;animation:pop-in .35s}
+.dnacard .kicker{font-weight:900;font-size:.85rem;letter-spacing:.08em;color:var(--yellow)}
+.dnahero{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+.dnahero .mascot{width:96px;height:96px}
+.dnahero>div{flex:1;min-width:240px;display:grid;gap:6px}
+.warn{background:#ff7b8a22;border:2px solid var(--bad);border-radius:14px;padding:10px 14px;font-weight:700}
+.row4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+@media (max-width:600px){.row4{grid-template-columns:1fr 1fr}}
+.review5{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+@media (max-width:760px){.review5{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.rv{display:grid;gap:6px;font-size:.82rem;background:#ffffff0d;border-radius:14px;padding:8px}
+.rv p{color:var(--mute);margin-top:4px}
+.qh{font-size:1.1rem;margin-top:6px}
+.q{font-weight:800}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opt{border:0;border-radius:16px;padding:10px 14px;background:var(--card2);color:var(--ink);cursor:pointer;display:grid;gap:2px;text-align:left;box-shadow:0 4px 0 #0003;transition:transform .12s}
+.opt b{font-size:1.3rem}
+.opt small{color:var(--mute);font-size:.82rem}
+.opt.sm{font-weight:800}
+.opt:hover{transform:translateY(-2px)}
+.opt[aria-pressed="true"]{background:var(--pink);color:#3a1034}
+.opt[aria-pressed="true"] small{color:#3a1034}
+.opt[class*="t-"] span{color:var(--ink)}
+.opt[class*="t-"][aria-pressed="true"]{background:currentColor}
+.opt[class*="t-"][aria-pressed="true"] span{color:#221a4d}
+.helix{display:flex;justify-content:center;gap:7px;height:64px;align-items:center}
+.helix i{width:11px;height:11px;border-radius:50%;background:var(--pink);animation:helix 1.6s ease-in-out infinite;animation-delay:calc(var(--i) * -.12s)}
+.helix i:nth-child(even){background:var(--mint)}
+@keyframes helix{0%,100%{transform:translateY(-22px) scale(.7)}50%{transform:translateY(22px) scale(1.2)}}
+.dnagrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,210px),1fr));gap:10px}
+.gene{background:#ffffff10;border-radius:16px;padding:12px 14px;display:grid;gap:4px;animation:pop-in .5s both}
+.gene .big{font-size:2rem;font-weight:900;color:var(--yellow);line-height:1}
+.gene .lab{color:var(--dim);font-size:.8rem;font-weight:700}
+.gene .val{font-weight:900;font-size:1.05rem}
+.gene small{color:var(--mute)}
+.recbox{background:#ffffff10;border-radius:16px;padding:12px 14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.pick3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media (max-width:600px){.pick3{grid-template-columns:1fr}}
+.pickc{border:0;padding:8px;border-radius:20px;background:var(--card2);color:var(--ink);cursor:pointer;display:grid;gap:8px;text-align:left;box-shadow:0 5px 0 #0003;transition:transform .15s}
+.pickc small{display:block;color:var(--mute);font-size:.82rem}
+.pickc[aria-pressed="true"]{box-shadow:0 5px 0 #0003,0 0 0 4px var(--yellow);transform:translateY(-3px)}
+.pwrap{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:18px;align-items:start}
+@media (max-width:760px){.pwrap{grid-template-columns:1fr}}
+.pv,.pp{display:grid;gap:10px}
+.dnacard textarea{min-height:200px;line-height:1.6}
+.tipbox{background:#ffd16622;border-radius:14px;padding:10px 14px;font-size:.9rem}
+.dnaimg{width:min(480px,100%);border-radius:18px;box-shadow:0 8px 0 #0004}
+.dnanav{justify-content:flex-end}
 #confetti{position:fixed;inset:0;z-index:55;pointer-events:none}
 .helpbtn{margin-left:auto;flex:none}
 .bubble+.helpbtn{margin-left:0}
@@ -284,6 +342,7 @@ footer{position:relative;z-index:1;color:var(--dim);font-size:.8rem;max-width:11
     <button role="tab" data-tab="learn" aria-selected="true">개념 익히기</button>
     <button role="tab" data-tab="game" aria-selected="false">분류 게임</button>
     <button role="tab" data-tab="gallery" aria-selected="false">NASA 사진 도감</button>
+    <button role="tab" data-tab="dna" aria-selected="false">우주 DNA 포스터</button>
     <button role="tab" data-tab="make" aria-selected="false">나만의 천체 만들기</button>
   </div>
 </nav>
@@ -409,6 +468,14 @@ footer{position:relative;z-index:1;color:var(--dim);font-size:.8rem;max-width:11
 </section>
 
 <!-- ============ 나만의 천체 ============ -->
+<section class="page" id="tab-dna" hidden>
+  <div style="display:grid;gap:8px">
+    <h2>우주 DNA 포스터</h2>
+    <p class="lead">설문에 답해 나만의 <b>우주 DNA</b>를 만들고, 성운이나 성단을 그리는 <b>AI 이미지 프롬프트</b>와 <b>포스터 프롬프트</b>를 자동으로 받아요.</p>
+  </div>
+  <div id="dna" style="display:grid;gap:14px"></div>
+</section>
+
 <section class="page" id="tab-make" hidden>
   <div style="display:grid;gap:8px">
     <h2>나만의 천체 만들기</h2>
@@ -460,7 +527,8 @@ footer{position:relative;z-index:1;color:var(--dim);font-size:.8rem;max-width:11
       <li><span class="n">1</span><div><b>개념 익히기</b><small>성운 3가지, 성단 2가지를 NASA 사진으로 배워요.</small></div></li>
       <li><span class="n">2</span><div><b>분류 게임</b><small>사진을 보고 알맞은 상자를 골라요. 결과 화면을 캡처해서 패들렛에 올려요.</small></div></li>
       <li><span class="n">3</span><div><b>NASA 사진 도감</b><small>진짜 우주 사진 89장을 이름을 가리고 맞혀 봐요.</small></div></li>
-      <li><span class="n">4</span><div><b>나만의 천체 만들기</b><small>나만의 성운이나 성단을 만들고 천체 카드를 패들렛에 올려요.</small></div></li>
+      <li><span class="n">4</span><div><b>우주 DNA 포스터</b><small>설문으로 나의 우주 DNA를 만들고 AI 그림·포스터 프롬프트를 받아요.</small></div></li>
+      <li><span class="n">5</span><div><b>나만의 천체 만들기</b><small>나만의 성운이나 성단을 만들고 천체 카드를 패들렛에 올려요.</small></div></li>
     </ol>
     <div class="actions">
       <button class="btn" id="gdLearn" type="button">개념부터 볼래요</button>
@@ -592,7 +660,7 @@ $("#mdDl").addEventListener("click",()=>{ if(!modalDl) return; const a=el("a",{h
 
 /* ===================== 탭 ===================== */
 const tabs=[...document.querySelectorAll("nav.tabs button")];
-const TALK={learn:"성운은 가스와 먼지의 구름, 성단은 별의 무리야!",game:"사진을 보고 알맞은 상자에 쏙 넣어 줘!",gallery:"진짜 NASA 사진이야. 이름을 가리고 맞혀 볼래?",make:"세상에 하나뿐인 천체를 만들어 보자!"};
+const TALK={dna:"설문에 답하면 너만의 우주 DNA가 생겨!",learn:"성운은 가스와 먼지의 구름, 성단은 별의 무리야!",game:"사진을 보고 알맞은 상자에 쏙 넣어 줘!",gallery:"진짜 NASA 사진이야. 이름을 가리고 맞혀 볼래?",make:"세상에 하나뿐인 천체를 만들어 보자!"};
 function showTab(name){
   tabs.forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===name));
   document.querySelectorAll("section.page").forEach(s=>s.hidden=s.id!=="tab-"+name);
@@ -600,6 +668,7 @@ function showTab(name){
   if(name==="gallery" && !gallery.made) gallery.draw();
   if(name==="game" && !game.ready) game.home();
   if(name==="make") maker.draw();
+  if(name==="dna") dna.render();
   store.set("nebula-tab",name);
 }
 tabs.forEach(b=>b.addEventListener("click",()=>showTab(b.dataset.tab)));
@@ -939,6 +1008,282 @@ const maker={
     this.setType("emission",true); this.loadDex(); }
 };
 
+/* ===================== 우주 DNA 포스터 (8단계) ===================== */
+const DNA_STEPS=["활동 안내","내 정보","복습·설문","우주 DNA","천체 고르기","이미지 프롬프트","작품 제목","포스터 프롬프트"];
+const MBTI_Q=[
+  ["EI","E","사람들과 함께 있을 때 힘이 나요","I","혼자 조용히 있을 때 힘이 나요"],
+  ["SN","S","눈에 보이는 사실이 좋아요","N","상상하고 떠올리는 게 좋아요"],
+  ["TF","T","이유와 원리를 따져 봐요","F","마음과 기분을 먼저 살펴요"],
+  ["JP","J","계획을 세우고 차근차근 해요","P","그때그때 자유롭게 해요"]
+];
+const SURVEY=[
+  {k:"season",q:"내가 좋아하는 계절은?",o:["봄","여름","가을","겨울"]},
+  {k:"word",q:"나를 가장 잘 나타내는 말은?",o:["활발한","차분한","신비로운","따뜻한","당당한","엉뚱한","꼼꼼한","다정한"]},
+  {k:"social",q:"친구들과 있을 때 나는?",o:["여럿이 북적북적 함께하는 게 좋아","마음 맞는 친구 몇 명과 자유롭게","혼자만의 시간도 꼭 필요해"]},
+  {k:"mood",q:"내가 좋아하는 분위기는?",o:["몽환적인","웅장한","귀여운","평화로운","역동적인"]},
+  {k:"value",q:"내가 가장 소중히 여기는 것은?",o:["우정","도전","꿈","가족","자유","배려"]}
+];
+const SCI={
+  emission:{name:"방출성운",group:"성운",img:"ae10",short:"붉게 스스로 빛나는 가스 구름",
+    sci:"가운데의 뜨겁고 젊은 별들에게서 에너지를 받아 스스로 붉은빛을 내는 방출성운",
+    look:"붉은색과 분홍색으로 빛나는 가스 구름, 그 속에 파랗게 빛나는 젊은 별 몇 개",palette:"붉은색과 분홍색"},
+  reflection:{name:"반사성운",group:"성운",img:"ar24",short:"별빛을 반사해 파랗게 보이는 먼지 구름",
+    sci:"스스로 빛을 내지 못하고 가까운 밝은 별의 빛을 반사해 파랗게 보이는 반사성운",
+    look:"밝은 별 하나를 감싸며 푸르게 빛나는 먼지 구름",palette:"파란색과 하늘색"},
+  dark:{name:"암흑성운",group:"성운",img:"ad87",short:"뒤쪽 별빛을 가리는 검은 구름",
+    sci:"가스와 먼지가 빽빽하게 모여 뒤쪽에서 오는 별빛을 가려 검게 보이는 암흑성운",
+    look:"별이 가득한 은하수를 배경으로 검은 먼지 구름이 별빛을 가리고 있는 모습",palette:"검은색과 별빛의 금색"},
+  open:{name:"산개성단",group:"성단",img:"ao9",short:"파란 별이 듬성듬성 모인 무리",
+    sci:"수십~수만 개의 젊고 뜨거운 별들이 듬성듬성 불규칙하게 모여 있는 산개성단(우리은하 원반의 나선팔에 있음)",
+    look:"파란색과 흰색으로 빛나는 별들이 일정한 모양 없이 엉성하게 모인 모습",palette:"파란색과 흰색"},
+  globular:{name:"구상성단",group:"성단",img:"ag7",short:"붉은 별이 공 모양으로 빽빽한 무리",
+    sci:"수만~수십만 개의 늙은 별들이 공 모양으로 빽빽하게 모여 있는 구상성단(우리은하 중심부와 헤일로에 있음)",
+    look:"붉은색과 노란색 별들이 공 모양으로 모여 가운데로 갈수록 더 빽빽하고 밝은 모습",palette:"붉은색과 노란색"}
+};
+const MAP={
+  E:["밝고 활기차게 반짝이는 별빛","사람들과 있을 때 힘이 나는 나"],I:["고요하고 깊이 있는 분위기","조용히 생각하는 나"],
+  S:["또렷하고 선명한 모양","사실을 좋아하는 나"],N:["상상력이 느껴지는 신비로운 모양","상상하는 나"],
+  T:["정돈되고 균형 잡힌 구조","원리를 따지는 나"],F:["부드럽게 번지는 따뜻한 빛","마음을 살피는 나"],
+  J:["대칭에 가까운 안정된 구도","차근차근 계획하는 나"],P:["자유롭게 퍼져 나가는 구도","자유로운 나"]
+};
+const SEASON={봄:"새싹이 돋는 듯한 생기",여름:"뜨겁게 타오르는 에너지",가을:"차분하고 깊은 여운",겨울:"맑고 투명한 느낌"};
+const VALUE={우정:"별들이 서로 손잡은 것처럼 이어져 보이게",도전:"위로 힘차게 솟아오르는 모양으로",꿈:"가운데에서 빛이 멀리 퍼져 나가게",가족:"큰 별 주위를 작은 별들이 포근하게 감싸게",자유:"넓은 우주로 자유롭게 흩어지게",배려:"밝은 별이 주변을 비춰 주는 것처럼"};
+const MOOD={몽환적인:"꿈속처럼 몽환적인",웅장한:"웅장하고 장엄한",귀여운:"사랑스럽고 아기자기한",평화로운:"잔잔하고 평화로운",역동적인:"힘차고 역동적인"};
+
+// 받침에 맞는 조사 붙이기
+const jong=w=>{ const c=String(w).trim().slice(-1).charCodeAt(0); return c>=0xAC00&&c<=0xD7A3?(c-0xAC00)%28:-1; };
+const J=(w,a,b)=>(jong(w)>0?a:b);                 // 조사만 돌려줌: J("도전","을","를") → "을"
+const RO=w=>(jong(w)>0&&jong(w)!==8?"으로":"로");
+const dna={
+  st:null, rendered:false,
+  load(){ this.st=Object.assign({step:1,info:{grade:"2",cls:"",num:"",name:"",ok:false},mbti:{},sv:{},interest:"",obj:"",neb:"",title:"",imgPrompt:"",posterPrompt:"",max:1},store.get("nebula-dna",{})); },
+  save(){ store.set("nebula-dna",this.st); },
+  who(){ const i=this.st.info; return `${i.grade}학년 ${i.cls}반 ${i.num}번 ${i.name}`; },
+  mbti(){ return MBTI_Q.map(q=>this.st.mbti[q[0]]||"?").join(""); },
+  rec(){ // 설문으로 추천하는 천체
+    const sv=this.st.sv, m=this.st.mbti;
+    let obj=sv.social==="여럿이 북적북적 함께하는 게 좋아"?"globular":sv.social==="마음 맞는 친구 몇 명과 자유롭게"?"open":"nebula";
+    let neb=m.EI==="E"||["활발한","당당한","역동적인"].includes(sv.word)?"emission":(m.TF==="F"||["따뜻한","다정한"].includes(sv.word)||sv.value==="배려")?"reflection":"dark";
+    if(m.EI==="I"&&m.SN==="N") neb=sv.value==="배려"?"reflection":"dark";
+    return {obj,neb};
+  },
+  kind(){ return this.st.obj==="nebula"?(this.st.neb||"emission"):this.st.obj; },
+  params(){ const t=this.kind(), m=this.st.mbti, d=DEFAULTS[t];
+    let seed=0; for(const ch of this.who()+this.st.title) seed=(seed*31+ch.charCodeAt(0))>>>0;
+    return {type:t,seed:seed||7,stars:(m.EI==="E"?75:m.EI==="I"?40:d.stars)/100,spread:(m.JP==="P"?75:m.JP==="J"?40:d.spread)/100,temp:d.temp/100,gas:(t==="open"?0:(m.SN==="N"?85:m.SN==="S"?60:d.gas))/100,hue:d.hue}; },
+  makeImgPrompt(){
+    const S=SCI[this.kind()], m=this.st.mbti, sv=this.st.sv;
+    const per=MBTI_Q.map(q=>m[q[0]]).filter(Boolean).map(l=>MAP[l][0]);
+    let p=`실제 우주 망원경 사진처럼 사실적인 ${S.name}${J(S.name,"을","를")} 그려줘. `;
+    p+=`이 천체는 ${S.sci}이야. 그래서 ${S.look}${RO(S.look)} 표현해줘. `;
+    if(per.length) p+=`나의 성격을 담아 ${per.join(", ")}${RO(per[per.length-1])} 표현해줘. `;
+    if(sv.season) p+=`${sv.season}처럼 ${SEASON[sv.season]}${J(SEASON[sv.season],"이","가")} 느껴지게 하고, `;
+    if(sv.value) p+=`내가 소중히 여기는 '${sv.value}'${J(sv.value,"을","를")} 상징하도록 ${VALUE[sv.value]} 그려줘. `;
+    if(this.st.interest.trim()) p+=`구름이나 별 무리의 모양 속에 내가 좋아하는 '${this.st.interest.trim()}'${J(this.st.interest.trim(),"이","가")} 은은하게 떠오르게 해줘. `;
+    p+=`전체적으로 ${MOOD[sv.mood]||"신비로운"} 분위기, 검은 우주 배경, 고해상도 천체 사진 스타일로 만들고 글자는 넣지 마.`;
+    return p;
+  },
+  makePosterPrompt(){
+    const S=SCI[this.kind()], sv=this.st.sv, t=this.st.title.trim()||"나의 우주";
+    return `세로로 긴 과학 포스터를 만들어줘.\n`+
+      `① 가운데: ${S.name} 그림을 크게 넣어줘. (${S.look})\n`+
+      `② 맨 위: 제목 '${t}'${J(t,"을","를")} 크고 또렷하게 적어줘. 글자 느낌은 ${MOOD[sv.mood]||"신비로운"} 분위기에 맞게.\n`+
+      `③ 제목 아래: '${this.who()}'${J(this.who(),"을","를")} 작게 적어줘.\n`+
+      `④ 아래쪽 설명 상자 3줄:\n`+
+      `  - 천체 종류: ${S.group} · ${S.name}\n`+
+      `  - 과학적 특징: ${S.sci}\n`+
+      `  - 나의 우주 DNA: MBTI ${this.mbti()}, ${sv.word||""} 나, 소중한 것 '${sv.value||""}', 좋아하는 계절 ${sv.season||""}\n`+
+      `⑤ 색 구성: 검은 우주 배경에 ${S.palette} 위주. 전체 분위기는 ${MOOD[sv.mood]||"신비로운"} 느낌으로.\n`+
+      `⑥ 글자는 모두 한글로 또렷하게 써줘.`;
+  },
+  // ---------- 화면 ----------
+  render(){
+    if(!this.st) this.load();
+    const box=$("#dna"); box.innerHTML="";
+    const step=this.st.step;
+    const bar=el("ol",{class:"stepper"});
+    DNA_STEPS.forEach((nm,i)=>{ const n=i+1; const li=el("li",{class:(n===step?"now ":"")+(n<step||n<=this.st.max?"done":"")});
+      const b=el("button",{type:"button"},`<span>${n}</span><small>${nm}</small>`); b.disabled=n>this.st.max;
+      b.addEventListener("click",()=>this.go(n)); li.append(b); bar.append(li); });
+    box.append(bar);
+    const card=el("div",{class:"card dnacard"}); box.append(card);
+    this["s"+step](card);
+    this.save();
+  },
+  go(n){ this.st.step=n; this.st.max=Math.max(this.st.max,n); this.render(); scrollTo({top:$("#tab-dna").offsetTop-70,behavior:"smooth"}); },
+  nav(card,{next="다음",ok=()=>true,prev=true}={}){
+    const row=el("div",{class:"actions dnanav"});
+    if(prev&&this.st.step>1){ const b=el("button",{class:"btn",type:"button"},"이전"); b.addEventListener("click",()=>this.go(this.st.step-1)); row.append(b); }
+    if(next){ const b=el("button",{class:"btn yellow",type:"button"},next); b.addEventListener("click",()=>{ const r=ok(); if(r===true) this.go(this.st.step+1); else { toast(r); mood($("#mascotTop"),"sad"); } }); row.append(b); }
+    card.append(row);
+  },
+  head(card,n,title,lead){ card.append(el("span",{class:"kicker"},`STEP ${n}`),el("h2",{},title)); if(lead) card.append(el("p",{class:"lead"},lead)); },
+  s1(c){
+    c.append(el("div",{class:"dnahero"},`${mascotSVG("mascotDna")}<div><span class="kicker">STEP 1</span><h2>나만의 우주 DNA 포스터 만들기</h2><p class="lead">설문에 답하면 내 성격이 담긴 <b>우주 DNA</b>가 만들어져요. 그 DNA로 성운이나 성단 그림을 만드는 <b>AI 프롬프트</b>와 <b>포스터 프롬프트</b>를 자동으로 만들어 줘요.</p></div>`));
+    const ol=el("ol",{class:"steps"});
+    DNA_STEPS.slice(1).forEach((nm,i)=>ol.append(el("li",{},`<span class="n">${i+2}</span><div><b>${nm}</b></div>`)));
+    c.append(ol);
+    this.nav(c,{next:"시작하기"});
+  },
+  s2(c){
+    this.head(c,2,"내 정보 적기","최종 결과물(포스터와 결과 카드)에 그대로 표시돼요.");
+    c.append(el("p",{class:"warn"},"⚠ 학년, 반, 번호, 이름은 <b>사실대로</b> 적어요. 다른 사람 이름을 쓰거나 거짓으로 적으면 안 돼요."));
+    const i=this.st.info;
+    const g=el("div",{class:"row4"});
+    g.innerHTML=`<div class="field"><label for="dGrade">학년</label><select id="dGrade"><option>1</option><option>2</option><option>3</option></select></div>
+      <div class="field"><label for="dCls">반</label><input type="number" id="dCls" min="1" max="20" inputmode="numeric"></div>
+      <div class="field"><label for="dNum">번호</label><input type="number" id="dNum" min="1" max="50" inputmode="numeric"></div>
+      <div class="field"><label for="dName">이름</label><input type="text" id="dName" maxlength="10" autocomplete="off"></div>`;
+    c.append(g);
+    const chk=el("label",{class:"switch"},`<input type="checkbox" id="dOk"> 위 내용을 사실대로 적었어요`); c.append(chk);
+    $("#dGrade").value=i.grade; $("#dCls").value=i.cls; $("#dNum").value=i.num; $("#dName").value=i.name; $("#dOk").checked=i.ok;
+    const sync=()=>{ i.grade=$("#dGrade").value; i.cls=$("#dCls").value.trim(); i.num=$("#dNum").value.trim(); i.name=$("#dName").value.trim(); i.ok=$("#dOk").checked; this.save(); };
+    c.querySelectorAll("input,select").forEach(x=>x.addEventListener("input",sync));
+    this.nav(c,{ok:()=>{ sync();
+      if(!/^\d{1,2}$/.test(i.cls)) return "반을 숫자로 적어 주세요.";
+      if(!/^\d{1,2}$/.test(i.num)) return "번호를 숫자로 적어 주세요.";
+      if(!/^[가-힣A-Za-z ]{2,10}$/.test(i.name)) return "이름을 2글자 이상 적어 주세요.";
+      if(!i.ok) return "'사실대로 적었어요'에 체크해 주세요.";
+      return true; }});
+  },
+  s3(c){
+    this.head(c,3,"복습하고 설문에 답하기","먼저 다섯 가지 천체를 다시 읽어 봐요. 그다음 MBTI와 설문에 답해요.");
+    const rv=el("div",{class:"review5"});
+    ["emission","reflection","dark","open","globular"].forEach(t=>{ const S=SCI[t]; const d=el("div",{class:"rv"}); const p=BYK[S.img];
+      d.append(photoBox(p,{cap:false}),el("div",{},`${chip(t)}<p>${S.short}</p>`)); rv.append(d); });
+    c.append(rv);
+    c.append(el("h3",{class:"qh"},"① MBTI (모르면 나와 더 가까운 쪽을 골라요)"));
+    MBTI_Q.forEach(([k,a,ad,b,bd])=>{ const row=el("div",{class:"pair"});
+      [[a,ad],[b,bd]].forEach(([l,dsc])=>{ const btn=el("button",{type:"button",class:"opt","aria-pressed":this.st.mbti[k]===l},`<b>${l}</b><small>${dsc}</small>`);
+        btn.addEventListener("click",()=>{ this.st.mbti[k]=l; [...row.children].forEach(x=>x.setAttribute("aria-pressed",x===btn)); this.save(); }); row.append(btn); });
+      c.append(row); });
+    c.append(el("h3",{class:"qh"},"② 설문"));
+    SURVEY.forEach(({k,q,o})=>{ c.append(el("p",{class:"q"},q)); const row=el("div",{class:"opts"});
+      o.forEach(v=>{ const btn=el("button",{type:"button",class:"opt sm","aria-pressed":this.st.sv[k]===v},v);
+        btn.addEventListener("click",()=>{ this.st.sv[k]=v; [...row.children].forEach(x=>x.setAttribute("aria-pressed",x===btn)); this.save(); }); row.append(btn); });
+      c.append(row); });
+    const f=el("div",{class:"field"},`<label for="dInt">내가 좋아하는 것 (선택, 예: 축구, 고양이, 피아노)</label><input type="text" id="dInt" maxlength="15">`);
+    c.append(f); $("#dInt").value=this.st.interest; $("#dInt").addEventListener("input",e=>{ this.st.interest=e.target.value; this.save(); });
+    this.nav(c,{next:"우주 DNA 만들기",ok:()=>{
+      const miss=MBTI_Q.filter(q=>!this.st.mbti[q[0]]).length; if(miss) return `MBTI ${miss}개를 더 골라 주세요.`;
+      const ms=SURVEY.filter(s=>!this.st.sv[s.k]); if(ms.length) return `'${ms[0].q}'에 답해 주세요.`;
+      const r=this.rec(); if(!this.st.obj){ this.st.obj=r.obj; this.st.neb=r.neb; }
+      return true; }});
+  },
+  s4(c){
+    const m=this.st.mbti, sv=this.st.sv, r=this.rec();
+    c.append(el("div",{class:"dnahero"},`${mascotSVG("mascotDna")}<div><span class="kicker">STEP 4</span><h2>나의 우주 DNA가 완성되었습니다!</h2><p class="lead">${esc(this.who())} 님의 답이 잘 반영되었는지 확인해 봐요. 다르면 <b>이전</b>을 눌러 고쳐요.</p></div>`));
+    const helix=el("div",{class:"helix","aria-hidden":"true"}); for(let i=0;i<14;i++) helix.append(el("i",{style:`--i:${i}`})); c.append(helix);
+    const g=el("div",{class:"dnagrid"});
+    MBTI_Q.forEach(q=>{ const l=m[q[0]]; g.append(el("div",{class:"gene"},`<span class="big">${l}</span><span>${MAP[l][1]}</span><small>→ ${MAP[l][0]}</small>`)); });
+    [["계절",sv.season,SEASON[sv.season]],["나를 나타내는 말",sv.word,"작품의 분위기에 담겨요"],["친구들과 있을 때",sv.social,"추천 천체를 정할 때 쓰여요"],["좋아하는 분위기",sv.mood,MOOD[sv.mood]+" 분위기"],["소중한 것",sv.value,VALUE[sv.value]]].forEach(([a,b,d])=>
+      g.append(el("div",{class:"gene"},`<span class="lab">${a}</span><span class="val">${esc(b)}</span><small>→ ${esc(d)}</small>`)));
+    if(this.st.interest.trim()) g.append(el("div",{class:"gene"},`<span class="lab">좋아하는 것</span><span class="val">${esc(this.st.interest)}</span><small>→ 그림 속에 은은하게 숨겨요</small>`));
+    c.append(g);
+    const rk=r.obj==="nebula"?r.neb:r.obj;
+    c.append(el("p",{class:"recbox"},`반짝이 추천 천체: ${chip(rk)} <span>${r.obj==="globular"?"여럿이 함께하는 걸 좋아하는 너는 별이 빽빽하게 모인 구상성단!":r.obj==="open"?"친구와 자유롭게 지내는 너는 별이 듬성듬성 모인 산개성단!":"혼자만의 시간도 소중한 너는 고요한 성운!"}</span>`));
+    if(!reduce){ const b=c.getBoundingClientRect(); setTimeout(()=>confetti(innerWidth/2,Math.max(120,b.top+80),90),300); }
+    mood($("#mascotTop"),"happy");
+    this.nav(c,{next:"천체 고르러 가기"});
+  },
+  s5(c){
+    this.head(c,5,"만들고 싶은 천체 고르기","추천과 달라도 괜찮아요. 내가 만들고 싶은 것을 골라요.");
+    const r=this.rec();
+    const g=el("div",{class:"pick3"});
+    [["nebula","성운","emission","가스와 먼지의 구름"],["open","산개성단","open","파란 별이 듬성듬성"],["globular","구상성단","globular","붉은 별이 공 모양으로 빽빽"]].forEach(([k,nm,tk,d])=>{
+      const b=el("button",{type:"button",class:"pickc","aria-pressed":this.st.obj===k});
+      b.append(photoBox(BYK[SCI[tk==="emission"?"emission":tk].img],{cap:false}),el("div",{},`<b>${nm}</b>${r.obj===k?' <span class="chip" style="color:var(--pink)"><span>추천</span></span>':""}<small>${d}</small>`));
+      b.addEventListener("click",()=>{ this.st.obj=k; if(k==="nebula"&&!this.st.neb) this.st.neb=r.neb; this.render(); });
+      g.append(b); });
+    c.append(g);
+    if(this.st.obj==="nebula"){
+      c.append(el("p",{class:"q"},"어떤 성운으로 만들까요?"));
+      const row=el("div",{class:"opts"});
+      ["emission","reflection","dark"].forEach(t=>{ const b=el("button",{type:"button",class:"opt sm "+TYPES[t].cls,"aria-pressed":this.st.neb===t},`<span>${TYPES[t].name}${r.neb===t?" · 추천":""}</span>`);
+        b.addEventListener("click",()=>{ this.st.neb=t; this.render(); }); row.append(b); });
+      c.append(row);
+    }
+    if(this.st.obj){ const S=SCI[this.kind()]; c.append(el("p",{class:"recbox"},`${chip(this.kind())} <span>${S.sci}</span>`)); }
+    this.nav(c,{next:"프롬프트 만들기",ok:()=>{ if(!this.st.obj) return "천체를 하나 골라 주세요."; if(this.st.obj==="nebula"&&!this.st.neb) return "성운의 종류를 골라 주세요."; this.st.imgPrompt=this.makeImgPrompt(); return true; }});
+  },
+  s6(c){
+    this.head(c,6,"이미지 프롬프트가 만들어졌어요","설문 결과와 고른 천체의 과학적 특징을 합쳐 만들었어요. 고치고 싶은 곳은 직접 고쳐도 돼요.");
+    const wrap=el("div",{class:"pwrap"});
+    const cv=el("canvas",{class:"sky",width:360,height:360}); render(this.params(),cv,360);
+    const left=el("div",{class:"pv"}); left.append(cv,el("p",{class:"lead",style:"font-size:.8rem"},"컴퓨터가 그린 미리보기예요. AI는 이 프롬프트로 더 멋진 그림을 그려 줘요."));
+    const right=el("div",{class:"pp"});
+    const ta=el("textarea",{id:"dImg",rows:"9"}); ta.value=this.st.imgPrompt||this.makeImgPrompt();
+    ta.addEventListener("input",()=>{ this.st.imgPrompt=ta.value; this.save(); });
+    const act=el("div",{class:"actions"});
+    const cp=el("button",{class:"btn yellow",type:"button"},"프롬프트 복사"); cp.addEventListener("click",()=>copyText(ta));
+    const re=el("button",{class:"btn",type:"button"},"처음 문장으로 되돌리기"); re.addEventListener("click",()=>{ ta.value=this.st.imgPrompt=this.makeImgPrompt(); this.save(); });
+    act.append(cp,re);
+    right.append(ta,act,el("p",{class:"tipbox"},"Canva AI(또는 선생님이 알려 준 AI 그림 도구)에 붙여 넣어 그림을 만들어요. 만든 그림이 <b>과학적으로 맞는지</b>(종류·빛나는 방식·색·모양) 꼭 확인해요!"));
+    wrap.append(left,right); c.append(wrap);
+    this.nav(c,{next:"제목 정하기"});
+  },
+  s7(c){
+    this.head(c,7,"작품 제목 정하기","포스터 맨 위에 크게 들어갈 제목이에요.");
+    const S=SCI[this.kind()], sv=this.st.sv;
+    const f=el("div",{class:"field"},`<label for="dTitle">작품 제목</label><input type="text" id="dTitle" maxlength="20" placeholder="예: 우정의 구상성단">`);
+    c.append(f); const inp=$("#dTitle"); inp.value=this.st.title; inp.addEventListener("input",()=>{ this.st.title=inp.value; this.save(); });
+    const ideas=[`${sv.value}의 ${S.name}`,`${sv.season}밤의 ${sv.word} ${S.name}`,`${this.st.info.name}의 우주 DNA`,`${(MOOD[sv.mood]||"").split(" ")[0]} ${S.group==="성운"?"구름":"별무리"}`].filter(x=>!/undefined/.test(x));
+    const row=el("div",{class:"opts"}); c.append(el("p",{class:"q"},"반짝이의 제목 아이디어 (눌러서 고르고 고쳐도 돼요)"));
+    ideas.forEach(t=>{ const b=el("button",{type:"button",class:"opt sm"},esc(t)); b.addEventListener("click",()=>{ inp.value=this.st.title=t; this.save(); inp.focus(); }); row.append(b); });
+    c.append(row);
+    this.nav(c,{next:"포스터 프롬프트 만들기",ok:()=>{ if(this.st.title.trim().length<2) return "제목을 2글자 이상 적어 주세요."; this.st.posterPrompt=this.makePosterPrompt(); return true; }});
+  },
+  s8(c){
+    this.head(c,8,"포스터 프롬프트가 완성됐어요","이미지 프롬프트로 그림을 만든 뒤, 이 프롬프트로 포스터를 만들어요.");
+    const ta=el("textarea",{id:"dPoster",rows:"11"}); ta.value=this.st.posterPrompt||this.makePosterPrompt();
+    ta.addEventListener("input",()=>{ this.st.posterPrompt=ta.value; this.save(); });
+    const act=el("div",{class:"actions"});
+    const cp=el("button",{class:"btn yellow",type:"button"},"포스터 프롬프트 복사"); cp.addEventListener("click",()=>copyText(ta));
+    const cp2=el("button",{class:"btn",type:"button"},"이미지 프롬프트 다시 복사"); cp2.addEventListener("click",()=>{ const t=el("textarea"); t.value=this.st.imgPrompt||this.makeImgPrompt(); copyText(t); });
+    act.append(cp,cp2);
+    c.append(ta,act,el("p",{class:"tipbox"},"AI가 한글 글자를 이상하게 그리면, 그림만 AI로 만들고 <b>제목과 이름은 Canva 글자 상자로 직접</b> 넣어요."));
+    c.append(el("h3",{class:"qh"},"나의 우주 DNA 결과 카드"));
+    const cardCv=this.card(); const img=el("img",{class:"dnaimg",alt:"나의 우주 DNA 결과 카드"}); img.src=cardCv.toDataURL("image/png"); c.append(img);
+    const a2=el("div",{class:"actions"});
+    const dl=el("button",{class:"btn pink",type:"button"},"결과 카드 PNG로 저장"); dl.addEventListener("click",()=>{ const a=el("a",{href:cardCv.toDataURL("image/png"),download:`우주DNA_${this.st.info.grade}-${this.st.info.cls}-${this.st.info.num}_${this.st.info.name}.png`}); document.body.append(a); a.click(); a.remove(); });
+    const again=el("button",{class:"btn",type:"button"},"처음부터 다시 하기"); again.addEventListener("click",()=>{ const keep=this.st.info; this.st=null; store.set("nebula-dna",{info:keep}); this.load(); this.st.step=2; this.st.max=2; this.render(); });
+    a2.append(dl,again); c.append(a2);
+    c.append(el("p",{class:"lead"},"완성한 포스터와 결과 카드를 패들렛에 올려요. 포스터에 쓴 프롬프트도 함께 적어요."));
+    this.nav(c,{next:null});
+    const b=c.getBoundingClientRect(); setTimeout(()=>confetti(innerWidth/2,Math.max(140,b.top+60),110),300); mood($("#mascotTop"),"happy");
+  },
+  card(){
+    const W=1080,H=1350, cv=el("canvas"); cv.width=W; cv.height=H; const x=cv.getContext("2d");
+    const S=SCI[this.kind()], sv=this.st.sv, F='"Malgun Gothic","맑은 고딕",sans-serif';
+    const bg=x.createLinearGradient(0,0,0,H); bg.addColorStop(0,"#2a2468"); bg.addColorStop(1,"#15123b"); x.fillStyle=bg; x.fillRect(0,0,W,H);
+    x.strokeStyle="#ffd166"; x.lineWidth=8; x.beginPath(); x.roundRect(20,20,W-40,H-40,40); x.stroke();
+    x.textBaseline="top"; x.fillStyle="#c3bbef"; x.font="bold 30px "+F; x.fillText("나의 우주 DNA 결과 카드",70,66);
+    x.fillStyle="#fbf8ff"; x.font="900 62px "+F; this.fitText(x,this.st.title||"나의 우주",70,112,W-140,62,F,"900");
+    x.fillStyle="#ffd166"; x.font="bold 34px "+F; x.fillText(this.who(),70,198);
+    const img=el("canvas"); render(this.params(),img,560); x.save(); x.beginPath(); x.roundRect(70,262,560,560,30); x.clip(); x.drawImage(img,70,262); x.restore();
+    const tc={open:"#7ef0d0",globular:"#ffd166",emission:"#ff7b9c",reflection:"#7cc4ff",dark:"#c2b2ec"}[this.kind()];
+    x.font="bold 34px "+F; const tl=S.group+" · "+S.name; const tw0=x.measureText(tl).width; x.fillStyle=tc; x.beginPath(); x.roundRect(670,262,tw0+44,58,29); x.fill(); x.fillStyle="#221a4d"; x.fillText(tl,692,273);
+    x.fillStyle="#fbf8ff"; x.font="bold 30px "+F; x.fillText("MBTI",670,350); x.font="900 76px "+F; x.fillStyle="#ffd166"; x.fillText(this.mbti(),670,388);
+    const rows=[["계절",sv.season],["나를 나타내는 말",sv.word],["좋아하는 분위기",sv.mood],["소중한 것",sv.value]];
+    rows.forEach(([a,b],i)=>{ x.fillStyle="#c3bbef"; x.font="26px "+F; x.fillText(a,670,500+i*80); x.fillStyle="#fbf8ff"; x.font="bold 34px "+F; x.fillText(b||"-",670,532+i*80); });
+    x.fillStyle="#fbf8ff"; x.font="bold 30px "+F; x.fillText("과학적 특징",70,860);
+    x.font="28px "+F; this.wrap(x,S.sci,70,904,W-140,42,3);
+    x.fillStyle="#fbf8ff"; x.font="bold 30px "+F; x.fillText("나의 성격이 담긴 모습",70,1050);
+    x.font="28px "+F; const per=MBTI_Q.map(q=>MAP[this.st.mbti[q[0]]]?.[0]).filter(Boolean).join(", "); this.wrap(x,per+(sv.value?`, '${sv.value}'${J(sv.value,"을","를")} 상징`:""),70,1094,W-140,42,3);
+    x.fillStyle="#8f86c9"; x.font="22px "+F; x.fillText("성운·성단 관측소 · "+new Date().toLocaleDateString("ko-KR")+" · 미리보기 그림은 컴퓨터가 그린 것",70,H-80);
+    return cv;
+  },
+  wrap(x,text,X,Y,maxW,lh,maxLines){ let line="",lines=[]; for(const ch of text){ if(x.measureText(line+ch).width>maxW){ lines.push(line); line=ch; } else line+=ch; } if(line) lines.push(line);
+    lines.slice(0,maxLines).forEach((l,i)=>x.fillText(i===maxLines-1&&lines.length>maxLines?l.slice(0,-1)+"…":l,X,Y+i*lh)); },
+  fitText(x,t,X,Y,maxW,size,F,w){ let s=size; x.font=`${w} ${s}px ${F}`; while(x.measureText(t).width>maxW&&s>30){ s-=2; x.font=`${w} ${s}px ${F}`; } x.fillText(t,X,Y); }
+};
+function copyText(ta){
+  const done=()=>{ toast("복사했어요! AI 도구에 붙여 넣어요"); mood($("#mascotTop"),"happy"); };
+  const fallback=()=>{ ta.focus?.(); ta.select?.(); try{ document.execCommand("copy"); done(); }catch(e){ toast("글자를 길게 눌러 직접 복사해 주세요"); } };
+  if(navigator.clipboard?.writeText) navigator.clipboard.writeText(ta.value).then(done,()=>{ if(ta.isConnected) fallback(); else { document.body.append(ta); fallback(); ta.remove(); } });
+  else { if(!ta.isConnected){ document.body.append(ta); fallback(); ta.remove(); } else fallback(); }
+}
+
 /* ===================== 시작 ===================== */
 maker.init();
 const guide=$("#guide");
@@ -950,7 +1295,7 @@ $("#gdGame").addEventListener("click",()=>closeGuide("game"));
 guide.addEventListener("click",e=>{ if(e.target===guide) closeGuide(); });
 document.addEventListener("keydown",e=>{ if(e.key==="Escape" && !guide.hidden) closeGuide(); });
 const first=location.hash.slice(1);
-showTab(["learn","game","gallery","make"].includes(first)?first:"learn");
+showTab(["learn","game","gallery","dna","make"].includes(first)?first:"learn");
 if(!first && !store.get("nebula-guide",0)) openGuide();
 </script>
 </body>
