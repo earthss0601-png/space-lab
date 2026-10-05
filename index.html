@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>성단·성운 관측소</title>
+<title>성운·성단 관측소</title>
 <style>
 /* 레이아웃: 반짝이는 밤하늘 위에 둥근 젤리 카드. 의도적으로 어두운 단일 테마(우주) */
 :root{
@@ -82,6 +82,7 @@ section.page{display:grid;gap:34px;animation:pop-in .4s ease}
 .concept .def b{color:var(--yellow)}
 .duo{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .duo figure{margin:0;display:grid;gap:8px;cursor:zoom-in}
+@media (max-width:600px){.duo.rel{grid-template-columns:1fr}}
 .duo figcaption{font-size:.88rem;color:var(--mute);display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 .tbl{overflow-x:auto;border-radius:var(--r);background:var(--card);box-shadow:0 8px 0 #0003}
 table{border-collapse:collapse;width:100%;min-width:560px}
@@ -270,10 +271,10 @@ footer{position:relative;z-index:1;color:var(--dim);font-size:.8rem;max-width:11
   <header class="top">
     <svg class="mascot" id="mascotTop" viewBox="0 0 120 120" aria-hidden="true"><use href="#m-star"/><g class="eyes"><ellipse cx="49" cy="58" rx="5" ry="7" fill="#2b2250"/><ellipse cx="71" cy="58" rx="5" ry="7" fill="#2b2250"/><circle cx="51" cy="55" r="2" fill="#fff"/><circle cx="73" cy="55" r="2" fill="#fff"/></g><path class="mouth" d="M52 72 Q60 80 68 72" stroke="#2b2250" stroke-width="4" fill="none" stroke-linecap="round"/></svg>
     <div class="brand">
-      <h1>성단·성운 <span>관측소</span></h1>
+      <h1>성운·성단 <span>관측소</span></h1>
       <p>중학교 2학년 과학 · 별과 우주 · NASA 진짜 우주 사진으로 배워요</p>
     </div>
-    <p class="bubble" id="talk">안녕! 나는 별 친구 반짝이야. 같이 성단과 성운을 구분해 보자!</p>
+    <p class="bubble" id="talk">안녕! 나는 별 친구 반짝이야. 같이 성운과 성단을 구분해 보자!</p>
     <button class="btn helpbtn" id="helpBtn" type="button">사용법</button>
   </header>
 </div>
@@ -293,15 +294,6 @@ footer{position:relative;z-index:1;color:var(--dim);font-size:.8rem;max-width:11
 <section class="page" id="tab-learn">
   <div class="two">
     <article class="card concept">
-      <span class="kicker">STAR CLUSTER</span>
-      <h2>성단 · 별들의 무리</h2>
-      <p class="def">많은 별이 <b>좁은 공간에 모여 무리</b>를 이룬 것이에요. 사진에서 <b>별 하나하나가 점</b>으로 보여요.</p>
-      <div class="duo">
-        <figure data-k="ao9"><div class="photo"></div><figcaption><span class="chip t-open"><span>산개성단</span></span>듬성듬성, 불규칙</figcaption></figure>
-        <figure data-k="ag7"><div class="photo"></div><figcaption><span class="chip t-globular"><span>구상성단</span></span>빽빽한 공 모양</figcaption></figure>
-      </div>
-    </article>
-    <article class="card concept">
       <span class="kicker">NEBULA</span>
       <h2>성운 · 가스와 먼지의 구름</h2>
       <p class="def">별과 별 사이의 <b>가스와 티끌(성간 물질)</b>이 많이 모여 <b>구름처럼</b> 보이는 것이에요. 빛을 내는 방법에 따라 세 가지로 나눠요.</p>
@@ -310,23 +302,6 @@ footer{position:relative;z-index:1;color:var(--dim);font-size:.8rem;max-width:11
         <figure data-k="ad87"><div class="photo"></div><figcaption><span class="chip t-dark"><span>암흑성운</span></span>별빛을 가려요</figcaption></figure>
       </div>
     </article>
-  </div>
-
-  <div style="display:grid;gap:14px">
-    <h2>산개성단 vs 구상성단</h2>
-    <div class="tbl">
-      <table>
-        <thead><tr><th></th><th class="t-open">산개성단</th><th class="t-globular">구상성단</th></tr></thead>
-        <tbody>
-          <tr><th>별의 수</th><td>수십 ~ 수만 개</td><td>수만 ~ 수십만 개</td></tr>
-          <tr><th>모양</th><td>별이 듬성듬성, 불규칙하게 모여 있어요</td><td>별이 공 모양으로 빽빽하게 모여 있고, 중심으로 갈수록 더 빽빽해요</td></tr>
-          <tr><th>별의 색</th><td>파란색 (표면 온도가 높아요)</td><td>붉은색 (표면 온도가 낮아요)</td></tr>
-          <tr><th>별의 나이</th><td>젊은 별이 많아요</td><td>늙은 별이 많아요</td></tr>
-          <tr><th>우리은하 속 위치</th><td>주로 은하 원반 (나선팔)</td><td>주로 은하 중심부와 은하 원반을 둘러싼 구형 공간(헤일로)</td></tr>
-          <tr><th>예</th><td>플레이아데스 성단(M45), 벌집 성단(M44), 이중성단</td><td>헤라클레스자리 구상성단(M13), 오메가 센타우리</td></tr>
-        </tbody>
-      </table>
-    </div>
   </div>
 
   <div style="display:grid;gap:14px">
@@ -350,6 +325,49 @@ footer{position:relative;z-index:1;color:var(--dim);font-size:.8rem;max-width:11
         <p class="how">가스와 먼지가 빽빽하게 모여서 <b>뒤쪽에서 오는 별빛을 가려</b> <b>검게</b> 보여요.</p>
         <p class="ex">예: 말머리 성운(오리온자리), 바너드 68, 파이프 성운</p>
       </article>
+    </div>
+  </div>
+
+  <div class="two">
+    <article class="card concept">
+      <span class="kicker">STAR CLUSTER</span>
+      <h2>성단 · 별들의 무리</h2>
+      <p class="def">많은 별이 <b>좁은 공간에 모여 무리</b>를 이룬 것이에요. 사진에서 <b>별 하나하나가 점</b>으로 보여요.</p>
+      <div class="duo">
+        <figure data-k="ao9"><div class="photo"></div><figcaption><span class="chip t-open"><span>산개성단</span></span>듬성듬성, 불규칙</figcaption></figure>
+        <figure data-k="ag7"><div class="photo"></div><figcaption><span class="chip t-globular"><span>구상성단</span></span>빽빽한 공 모양</figcaption></figure>
+      </div>
+    </article>
+  </div>
+
+  <div style="display:grid;gap:14px">
+    <h2>산개성단 vs 구상성단</h2>
+    <div class="tbl">
+      <table>
+        <thead><tr><th></th><th class="t-open">산개성단</th><th class="t-globular">구상성단</th></tr></thead>
+        <tbody>
+          <tr><th>별의 수</th><td>수십 ~ 수만 개</td><td>수만 ~ 수십만 개</td></tr>
+          <tr><th>모양</th><td>별이 듬성듬성, 불규칙하게 모여 있어요</td><td>별이 공 모양으로 빽빽하게 모여 있고, 중심으로 갈수록 더 빽빽해요</td></tr>
+          <tr><th>별의 색</th><td>파란색 (표면 온도가 높아요)</td><td>붉은색 (표면 온도가 낮아요)</td></tr>
+          <tr><th>별의 나이</th><td>젊은 별이 많아요</td><td>늙은 별이 많아요</td></tr>
+          <tr><th>우리은하 속 위치</th><td>주로 은하 원반 (나선팔)</td><td>주로 은하 중심부와 은하 원반을 둘러싼 구형 공간(헤일로)</td></tr>
+          <tr><th>예</th><td>플레이아데스 성단(M45), 벌집 성단(M44), 이중성단</td><td>헤라클레스자리 구상성단(M13), 오메가 센타우리</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card concept">
+    <span class="kicker">NEBULA → STAR → CLUSTER</span>
+    <h2>성운과 성단의 관계</h2>
+    <div class="duo rel">
+      <figure data-k="messier-16"><div class="photo"></div><figcaption>독수리 성운 '창조의 기둥' · 별이 태어나는 곳</figcaption></figure>
+      <div style="display:grid;gap:10px;align-content:center">
+        <p class="def">① 성운 속 가스와 먼지가 뭉쳐요.</p>
+        <p class="def">② 뭉친 곳에서 새로운 별이 태어나요.</p>
+        <p class="def">③ 함께 태어난 별들이 무리를 지으면 <b>산개성단</b>이 돼요.</p>
+        <p class="lead">그래서 산개성단에는 젊은 별이 많고, 플레이아데스 성단처럼 주변에 성운이 남아 있기도 해요.</p>
+      </div>
     </div>
   </div>
 
@@ -436,13 +454,13 @@ footer{position:relative;z-index:1;color:var(--dim);font-size:.8rem;max-width:11
 <div class="modal" id="guide" hidden>
   <div class="box guide" role="dialog" aria-modal="true" aria-labelledby="gdTitle">
     <svg class="mascot" viewBox="0 0 120 120" aria-hidden="true"><use href="#m-star"/><g class="eyes"><ellipse cx="49" cy="58" rx="5" ry="7" fill="#2b2250"/><ellipse cx="71" cy="58" rx="5" ry="7" fill="#2b2250"/><circle cx="51" cy="55" r="2" fill="#fff"/><circle cx="73" cy="55" r="2" fill="#fff"/></g><path d="M48 70 Q60 88 72 70 Z" fill="#2b2250" stroke="#2b2250" stroke-width="4" stroke-linejoin="round"/></svg>
-    <h3 id="gdTitle">반가워! 성단·성운 관측소야</h3>
+    <h3 id="gdTitle">반가워! 성운·성단 관측소야</h3>
     <p class="lead">위쪽 메뉴 버튼을 눌러서 차례대로 해 봐요.</p>
     <ol class="steps">
-      <li><span class="n">1</span><div><b>개념 익히기</b><small>성단 2가지, 성운 3가지를 NASA 사진으로 배워요.</small></div></li>
-      <li><span class="n">2</span><div><b>분류 게임</b><small>사진을 보고 알맞은 상자를 골라요. 결과 화면을 캡처해서 선생님께 보내요.</small></div></li>
+      <li><span class="n">1</span><div><b>개념 익히기</b><small>성운 3가지, 성단 2가지를 NASA 사진으로 배워요.</small></div></li>
+      <li><span class="n">2</span><div><b>분류 게임</b><small>사진을 보고 알맞은 상자를 골라요. 결과 화면을 캡처해서 패들렛에 올려요.</small></div></li>
       <li><span class="n">3</span><div><b>NASA 사진 도감</b><small>진짜 우주 사진 89장을 이름을 가리고 맞혀 봐요.</small></div></li>
-      <li><span class="n">4</span><div><b>나만의 천체 만들기</b><small>나만의 성단이나 성운을 만들고 천체 카드를 저장해요.</small></div></li>
+      <li><span class="n">4</span><div><b>나만의 천체 만들기</b><small>나만의 성운이나 성단을 만들고 천체 카드를 패들렛에 올려요.</small></div></li>
     </ol>
     <div class="actions">
       <button class="btn" id="gdLearn" type="button">개념부터 볼래요</button>
@@ -564,7 +582,7 @@ function openPhoto(p){
 }
 function openCard(cv,name){
   $("#mdImg").src=cv.toDataURL("image/png"); $("#mdImg").alt="천체 카드"; $("#mdImg").onerror=null;
-  $("#mdChip").innerHTML=""; $("#mdTitle").textContent=name+" 천체 카드"; $("#mdNote").textContent="카드 그림을 오른쪽 클릭(휴대폰은 길게 누르기)해서 저장할 수도 있어요."; $("#mdSrc").textContent="";
+  $("#mdChip").innerHTML=""; $("#mdTitle").textContent=name+" 천체 카드"; $("#mdNote").textContent="PNG로 저장한 뒤 패들렛에 올려요. 고른 종류와 근거(특징 2가지)도 함께 적어요. 카드 그림을 오른쪽 클릭(휴대폰은 길게 누르기)해서 저장할 수도 있어요."; $("#mdSrc").textContent="";
   $("#mdLink").hidden=true; $("#mdDl").hidden=false; modalDl={cv,name}; $("#modal").hidden=false; $("#mdClose").focus();
 }
 $("#mdClose").addEventListener("click",()=>$("#modal").hidden=true);
@@ -574,7 +592,7 @@ $("#mdDl").addEventListener("click",()=>{ if(!modalDl) return; const a=el("a",{h
 
 /* ===================== 탭 ===================== */
 const tabs=[...document.querySelectorAll("nav.tabs button")];
-const TALK={learn:"성단은 별의 무리, 성운은 가스와 먼지의 구름이야!",game:"사진을 보고 알맞은 상자에 쏙 넣어 줘!",gallery:"진짜 NASA 사진이야. 이름을 가리고 맞혀 볼래?",make:"세상에 하나뿐인 천체를 만들어 보자!"};
+const TALK={learn:"성운은 가스와 먼지의 구름, 성단은 별의 무리야!",game:"사진을 보고 알맞은 상자에 쏙 넣어 줘!",gallery:"진짜 NASA 사진이야. 이름을 가리고 맞혀 볼래?",make:"세상에 하나뿐인 천체를 만들어 보자!"};
 function showTab(name){
   tabs.forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===name));
   document.querySelectorAll("section.page").forEach(s=>s.hidden=s.id!=="tab-"+name);
@@ -718,7 +736,7 @@ const game={
     clearInterval(this.timer);
     const n=this.log.length, ok=this.log.filter(x=>x.ok).length, rate=n?ok/n:0;
     const stars=rate>=.9?3:rate>=.7?2:rate>=.4?1:0;
-    const rank=stars===3?"성단·성운 박사":stars===2?"우주 관측 대원":stars===1?"꼬마 천문학자":"우주 견습생";
+    const rank=stars===3?"성운·성단 박사":stars===2?"우주 관측 대원":stars===1?"꼬마 천문학자":"우주 견습생";
     const g=$("#game"); g.innerHTML="";
     const R=el("div",{class:"card result"});
     R.innerHTML=`${mascotSVG("mascotRes")}<div class="stars3">${[1,2,3].map(i=>`<span class="${i<=stars?"on":""}">★</span>`).join("")}</div>
@@ -727,7 +745,7 @@ const game={
     ORDER.forEach(t=>{ const L=this.log.filter(x=>x.p.t===t); if(!L.length) return; const c=L.filter(x=>x.ok).length;
       rows.append(el("div",{},`${chip(t)}<div class="progress"><i style="width:${c/L.length*100}%"></i></div><span>${c}/${L.length}</span>`)); });
     R.append(rows);
-    R.append(el("p",{class:"lead"},"이 화면을 캡처해서 선생님께 보내요."));
+    R.append(el("p",{class:"lead"},"이 화면을 캡처해서 패들렛에 올려요."));
     if(n){ R.append(el("p",{class:"lead"},"사진을 눌러 다시 살펴봐요")); const rv=el("div",{class:"review"});
       this.log.forEach(x=>{ const b=el("button",{type:"button",class:x.ok?"ok":"no"}); const ph=photoBox(x.p,{cap:false}); ph.append(el("span",{class:"mark"},x.ok?"O":"X")); b.append(ph,el("span",{},esc(x.p.name))); b.addEventListener("click",()=>openPhoto(x.p)); rv.append(b); });
       R.append(rv); }
