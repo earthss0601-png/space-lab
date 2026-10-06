@@ -307,7 +307,7 @@ textarea{resize:vertical;min-height:70px}
 .xtile{position:relative;border-radius:14px;cursor:grab;transition:transform .15s;outline:3px solid transparent;touch-action:manipulation}
 .xtile .photo{border-radius:12px}
 .xtile:hover{transform:translateY(-2px) rotate(-1deg)}
-.xtile.sel{outline-color:var(--yellow);transform:scale(1.05);box-shadow:0 0 20px #ffd16688}
+.xtile.sel{outline-color:var(--yellow);transform:scale(.95);box-shadow:0 0 18px #ffd16688}
 .xzoom{position:absolute;right:4px;top:4px;width:28px;height:28px;border-radius:50%;border:0;background:#000a;color:#fff;cursor:pointer;font-size:.8rem;line-height:1}
 .xchip{position:absolute;left:4px;bottom:4px}
 .xchip .chip{font-size:.68rem;padding:1px 7px}
@@ -323,6 +323,36 @@ textarea{resize:vertical;min-height:70px}
 .xl small{color:var(--mute);font-size:.78rem}
 .xmini{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;width:100%}
 .xmini .photo{border-radius:8px}
+/* 여러 장 선택 막대 */
+#tab-explore{padding-bottom:110px}
+.xbar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:40;width:min(780px,calc(100% - 24px));background:#1b1648;border:2px solid var(--yellow);border-radius:20px;padding:10px 14px;display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;box-shadow:0 10px 30px #000c}
+.xbtns{display:flex;flex-wrap:wrap;gap:6px}
+.xcount{font-size:.95rem}
+.btn.sm{padding:7px 12px;font-size:.88rem;border-radius:12px}
+.xtrayhead{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.xcheck{position:absolute;left:5px;top:5px;width:24px;height:24px;border-radius:50%;background:#0008;border:2px solid #fffa;color:transparent;display:grid;place-items:center;font-weight:900;font-size:.8rem;pointer-events:none}
+.xtile.sel .xcheck{background:var(--yellow);border-color:var(--yellow);color:#2b2250}
+.ghost .gcount{position:absolute;right:4px;top:4px;background:var(--pink);color:#3a1034;border-radius:999px;padding:0 8px;font-weight:900}
+/* 빛의 이동 시뮬레이션 */
+.sim{display:grid;gap:14px}
+.simwrap{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:820px){.simwrap{grid-template-columns:1fr}}
+.simstage canvas{display:block;width:100%;border-radius:16px}
+.simside{display:grid;gap:10px}
+.simobs{display:grid;justify-items:center;gap:6px;background:#ffffff0d;border-radius:16px;padding:12px;text-align:center}
+.simobs .lab{font-size:.8rem;color:var(--dim);font-weight:700}
+.simobs .sw{width:90px;height:90px;border-radius:50%;background:#0a0820;box-shadow:inset 0 0 0 3px #ffffff22;transition:background .5s}
+.simobs small{color:var(--mute);font-size:.78rem}
+.simside h3{font-size:1.05rem}
+.simsteps{margin:0;padding-left:1.3em;display:grid;gap:6px;font-size:.9rem;color:var(--dim)}
+.simsteps li{transition:color .3s}
+.simsteps li.on{color:var(--ink);font-weight:700}
+.simsteps li.on::marker{color:var(--yellow)}
+.simctl{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.simr{display:inline-flex;gap:8px;align-items:center;font-weight:700;color:var(--mute)}
+.simr input{width:130px}
+.simleg{display:flex;flex-wrap:wrap;gap:14px;font-size:.82rem;color:var(--mute)}
+.simleg i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:5px;vertical-align:-1px}
 #confetti{position:fixed;inset:0;z-index:55;pointer-events:none}
 .helpbtn{margin-left:auto;flex:none}
 .bubble+.helpbtn{margin-left:0}
@@ -432,6 +462,8 @@ footer{position:relative;z-index:1;color:var(--dim);font-size:.8rem;max-width:11
       </article>
     </div>
   </div>
+
+  <div id="simHost"></div>
 
   <div class="two">
     <article class="card concept">
@@ -720,6 +752,7 @@ function showTab(name){
   if(name==="make") maker.draw();
   if(name==="dna") dna.render();
   if(name==="explore") explore.render();
+  if(name==="learn") sim.build();
   store.set("nebula-tab",name);
 }
 tabs.forEach(b=>b.addEventListener("click",()=>showTab(b.dataset.tab)));
@@ -1062,21 +1095,21 @@ const maker={
 /* ===================== 사진 탐구 (나만의 기준으로 나누기) ===================== */
 const EXPLORE_SET=["ao9","ao19","ao48","ag7","ag10","ae10","ae3","messier-42","ar24","ar60","ad87","ad93"];
 const explore={
-  st:null, sel:null,
+  st:null, sel:new Set(),
   fresh(set){ return {set:set||EXPLORE_SET.slice(),place:{},groups:[{name:"",crit:""},{name:"",crit:""}],revealed:false,note:""}; },
   load(){ const v=store.get("nebula-explore",null); this.st=(v&&Array.isArray(v.set)&&v.set.every(k=>BYK[k]))?v:this.fresh(); },
   save(){ store.set("nebula-explore",this.st); },
   randomSet(){ const want={open:3,globular:2,emission:3,reflection:2,dark:2}, out=[];
     ORDER.forEach(t=>out.push(...shuffle(PLAY.filter(p=>p.t===t)).slice(0,want[t]).map(p=>p.k))); return shuffle(out); },
   where(k){ const g=this.st.place[k]; return g===undefined?-1:g; },
+  gname(i){ const n=(this.st.groups[i]?.name||"").trim(); return n?`${i+1}. ${n}`:`${i+1}번 무리`; },
   render(){
     if(!this.st) this.load();
     const st=this.st, box=$("#explore"); box.innerHTML="";
+    this.sel=new Set([...this.sel].filter(k=>st.set.includes(k)));
     const placed=st.set.filter(k=>this.where(k)>=0).length;
-    // 안내
-    const used=st.groups.length;
     const hint=st.revealed?"과학자의 분류와 내 분류를 비교해 봐요. 같은 점과 다른 점은 무엇일까요?"
-      :placed<st.set.length?(used<=2?"<b>1단계</b> 가장 크게 다른 점을 찾아 사진을 <b>두 무리</b>로 나눠 봐요. 사진을 누른 뒤 무리 상자를 누르면 들어가요.":"<b>2단계</b> 무리를 더 잘게 나눴어요. 남은 사진도 알맞은 무리에 넣어요.")
+      :placed<st.set.length?(st.groups.length<=2?"<b>1단계</b> 가장 크게 다른 점을 찾아 <b>두 무리</b>로 나눠 봐요. 사진을 <b>여러 장 눌러 고른 뒤</b>, 아래 막대의 무리 버튼이나 무리 상자를 누르면 한꺼번에 들어가요.":"<b>2단계</b> 무리를 더 잘게 나눴어요. 남은 사진도 여러 장 골라 알맞은 무리에 넣어요.")
       :"모두 나눴어요! 무리마다 <b>이름</b>과 <b>나눈 기준</b>을 적고, 더 나눌 수 있으면 <b>+ 무리 추가</b>를 눌러 봐요.";
     const top=el("div",{class:"card xtop"});
     top.innerHTML=`<div class="xhint">${mascotSVG("mascotX")}<p>${hint}</p></div>`;
@@ -1085,16 +1118,18 @@ const explore={
       const add=el("button",{class:"btn",type:"button"},"+ 무리 추가"); add.disabled=st.groups.length>=6;
       add.addEventListener("click",()=>{ st.groups.push({name:"",crit:""}); this.save(); this.render(); }); tb.append(add);
     }
-    const other=el("button",{class:"btn",type:"button"},"다른 사진으로 바꾸기"); other.addEventListener("click",()=>{ this.st=this.fresh(this.randomSet()); this.sel=null; this.save(); this.render(); });
-    const reset=el("button",{class:"btn",type:"button"},"처음부터"); reset.addEventListener("click",()=>{ this.st=this.fresh(st.set); this.sel=null; this.save(); this.render(); });
+    const other=el("button",{class:"btn",type:"button"},"다른 사진으로 바꾸기"); other.addEventListener("click",()=>{ this.st=this.fresh(this.randomSet()); this.sel.clear(); this.save(); this.render(); });
+    const reset=el("button",{class:"btn",type:"button"},"처음부터"); reset.addEventListener("click",()=>{ this.st=this.fresh(st.set); this.sel.clear(); this.save(); this.render(); });
     tb.append(other,reset); top.append(tb); box.append(top);
     // 아직 나누지 않은 사진
     const rest=st.set.filter(k=>this.where(k)<0);
     if(rest.length||!st.revealed){
       const tray=el("div",{class:"card xzone xtray","data-zone":"-1"});
-      tray.append(el("p",{class:"xlab"},`아직 나누지 않은 사진 <span class="mono">${rest.length}장</span>`));
+      const th=el("div",{class:"xtrayhead"}); th.append(el("p",{class:"xlab"},`아직 나누지 않은 사진 <span class="mono">${rest.length}장</span>`));
+      if(rest.length&&!st.revealed){ const all=el("button",{class:"btn sm",type:"button"},"남은 사진 모두 선택"); all.addEventListener("click",e=>{ e.stopPropagation(); rest.forEach(k=>this.sel.add(k)); this.syncSel(); }); th.append(all); }
+      tray.append(th);
       const g=el("div",{class:"xtiles"}); rest.forEach(k=>g.append(this.tile(k))); tray.append(g);
-      if(!rest.length) tray.append(el("p",{class:"lead",style:"font-size:.85rem"},"사진을 여기로 옮기면 무리에서 빠져요."));
+      if(!rest.length) tray.append(el("p",{class:"lead",style:"font-size:.85rem"},"무리에서 빼고 싶은 사진을 골라 아래 막대의 [빼기]를 눌러요."));
       box.append(tray);
     }
     // 무리들
@@ -1103,56 +1138,74 @@ const explore={
       const card=el("div",{class:"card xzone xgroup","data-zone":String(i)});
       const head=el("div",{class:"xghead"});
       head.innerHTML=`<span class="xnum">${i+1}</span><input type="text" maxlength="14" placeholder="무리 이름 (예: 구름 무리)" aria-label="무리 ${i+1} 이름">`;
-      const nm=head.querySelector("input"); nm.value=gr.name; nm.disabled=st.revealed; nm.addEventListener("input",()=>{ gr.name=nm.value; this.save(); this.checkReady(); });
+      const nm=head.querySelector("input"); nm.value=gr.name; nm.disabled=st.revealed; nm.addEventListener("input",()=>{ gr.name=nm.value; this.save(); this.checkReady(); this.bar(); });
       const mine=st.set.filter(k=>this.where(k)===i);
-      if(!st.revealed&&st.groups.length>2&&!mine.length){ const x=el("button",{class:"x",type:"button","aria-label":"무리 지우기"},"✕"); x.addEventListener("click",()=>{ st.groups.splice(i,1); for(const k in st.place){ if(st.place[k]>i) st.place[k]--; } this.save(); this.render(); }); head.append(x); }
+      if(!st.revealed&&st.groups.length>2&&!mine.length){ const x=el("button",{class:"x",type:"button","aria-label":"무리 지우기"},"✕"); x.addEventListener("click",e=>{ e.stopPropagation(); st.groups.splice(i,1); for(const k in st.place){ if(st.place[k]>i) st.place[k]--; } this.save(); this.render(); }); head.append(x); }
       const crit=el("textarea",{rows:"2",maxlength:"60",placeholder:"나눈 기준: 예) 작은 점들이 모여 있어요","aria-label":`무리 ${i+1} 기준`}); crit.value=gr.crit; crit.disabled=st.revealed;
       crit.addEventListener("input",()=>{ gr.crit=crit.value; this.save(); this.checkReady(); });
       const tiles=el("div",{class:"xtiles"}); mine.forEach(k=>tiles.append(this.tile(k)));
-      if(!mine.length) tiles.append(el("p",{class:"xempty"},"사진을 누른 뒤 여기를 눌러요"));
+      if(!mine.length) tiles.append(el("p",{class:"xempty"},"사진을 골라 놓고 여기를 눌러요"));
       card.append(head,crit,tiles);
       if(st.revealed&&mine.length){ const cnt={}; mine.forEach(k=>cnt[BYK[k].t]=(cnt[BYK[k].t]||0)+1);
         card.append(el("div",{class:"xsum"},Object.entries(cnt).map(([t,n])=>`${chip(t)} <span class="mono">${n}</span>`).join(" "))); }
       gw.append(card);
     });
     box.append(gw);
-    box.querySelectorAll("[data-zone]").forEach(z=>z.addEventListener("click",e=>{ if(e.target.closest("button,input,textarea")) return; if(this.sel) this.move(this.sel,+z.dataset.zone); }));
-    // 비교하기
+    box.querySelectorAll("[data-zone]").forEach(z=>z.addEventListener("click",e=>{ if(e.target.closest("button,input,textarea,.xtile")) return; if(this.sel.size) this.moveMany([...this.sel],+z.dataset.zone); }));
     if(!st.revealed){
       const go=el("button",{class:"btn yellow",type:"button",id:"xReveal",style:"justify-self:center;font-size:1.1rem;padding:14px 26px"},"과학자의 분류와 비교하기");
-      go.addEventListener("click",()=>{ const r=this.ready(); if(r!==true){ toast(r); mood($("#mascotTop"),"sad"); return; } st.revealed=true; this.sel=null; this.save(); this.render();
+      go.addEventListener("click",()=>{ const r=this.ready(); if(r!==true){ toast(r); mood($("#mascotTop"),"sad"); return; } st.revealed=true; this.sel.clear(); this.save(); this.render();
         const b=$("#xSci")?.getBoundingClientRect(); confetti(innerWidth/2,b?Math.max(120,b.top):200,100); mood($("#mascotTop"),"happy"); say("과학자들은 어떻게 나눴는지 볼까?"); });
       box.append(go); this.checkReady();
+      box.append(el("div",{class:"xbar",id:"xBar",hidden:""}));
+      this.bar();
     } else box.append(this.sci());
+  },
+  // 선택 표시만 바꾸기 (화면 전체를 다시 그리지 않음)
+  syncSel(){ document.querySelectorAll("#explore .xtile").forEach(t=>t.classList.toggle("sel",this.sel.has(t.dataset.k))); this.bar(); },
+  bar(){
+    const b=$("#xBar"); if(!b) return;
+    if(!this.sel.size){ b.hidden=true; return; }
+    b.hidden=false; b.innerHTML="";
+    b.append(el("span",{class:"xcount"},`<b>${this.sel.size}장</b> 선택됨 →`));
+    const row=el("div",{class:"xbtns"});
+    this.st.groups.forEach((g,i)=>{ const x=el("button",{class:"btn yellow sm",type:"button"},esc(this.gname(i))); x.addEventListener("click",()=>this.moveMany([...this.sel],i)); row.append(x); });
+    if([...this.sel].some(k=>this.where(k)>=0)){ const o=el("button",{class:"btn sm",type:"button"},"빼기"); o.addEventListener("click",()=>this.moveMany([...this.sel],-1)); row.append(o); }
+    const c=el("button",{class:"btn sm",type:"button"},"선택 해제"); c.addEventListener("click",()=>{ this.sel.clear(); this.syncSel(); }); row.append(c);
+    b.append(row);
   },
   tile(k){
     const p=BYK[k], st=this.st;
-    const t=el("div",{class:"xtile"+(this.sel===k?" sel":""),role:"button",tabindex:"0","aria-label":"우주 사진"});
-    const ph=photoBox(p,{cap:false}); t.append(ph);
+    const t=el("div",{class:"xtile"+(this.sel.has(k)?" sel":""),role:"button",tabindex:"0","aria-label":"우주 사진 고르기"}); t.dataset.k=k;
+    t.append(photoBox(p,{cap:false}));
+    if(!st.revealed) t.append(el("span",{class:"xcheck","aria-hidden":"true"},"✓"));
     const z=el("button",{class:"xzoom",type:"button","aria-label":"크게 보기"},"🔍"); z.addEventListener("click",e=>{ e.stopPropagation(); openPhoto(p,{plain:!st.revealed}); }); t.append(z);
     if(st.revealed) t.append(el("span",{class:"xchip"},chip(p.t)));
     if(!st.revealed){
-      t.addEventListener("click",e=>{ e.stopPropagation(); this.sel=this.sel===k?null:k; this.render(); if(this.sel) say("어느 무리에 넣을까? 무리 상자를 눌러 줘!"); });
+      t.addEventListener("click",e=>{ e.stopPropagation(); if(t._skip){ t._skip=false; return; }
+        this.sel.has(k)?this.sel.delete(k):this.sel.add(k); this.syncSel();
+        if(this.sel.size===1) say("여러 장 골라도 돼! 다 골랐으면 아래 버튼을 눌러 줘."); });
       t.addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); t.click(); } });
-      this.drag(t,k);
+      if(!TOUCH) this.drag(t,k);
     }
     return t;
   },
   drag(t,k){
-    let ghost=null, sx=0, sy=0, moved=false;
-    t.addEventListener("pointerdown",e=>{ if(e.button||e.target.closest(".xzoom")) return; sx=e.clientX; sy=e.clientY; moved=false;
-      const mv=ev=>{ if(!moved&&Math.hypot(ev.clientX-sx,ev.clientY-sy)<8) return;
-        if(!moved){ moved=true; ghost=el("div",{class:"ghost"}); ghost.append(t.querySelector("img").cloneNode()); document.body.append(ghost); }
+    t.addEventListener("pointerdown",e=>{ if(e.button||e.target.closest(".xzoom")) return;
+      const sx=e.clientX, sy=e.clientY; let moved=false, ghost=null;
+      const mv=ev=>{ if(!moved&&Math.hypot(ev.clientX-sx,ev.clientY-sy)<10) return;
+        if(!moved){ moved=true; if(!this.sel.has(k)){ this.sel.add(k); this.syncSel(); }
+          ghost=el("div",{class:"ghost"}); ghost.append(t.querySelector("img").cloneNode()); if(this.sel.size>1) ghost.append(el("span",{class:"gcount"},String(this.sel.size))); document.body.append(ghost); }
         ghost.style.left=ev.clientX+"px"; ghost.style.top=ev.clientY+"px";
         document.querySelectorAll(".xzone.over").forEach(z=>z.classList.remove("over"));
         document.elementFromPoint(ev.clientX,ev.clientY)?.closest("[data-zone]")?.classList.add("over"); };
       const up=ev=>{ removeEventListener("pointermove",mv); removeEventListener("pointerup",up);
-        if(!moved) return; ghost?.remove(); document.querySelectorAll(".xzone.over").forEach(z=>z.classList.remove("over"));
-        const z=document.elementFromPoint(ev.clientX,ev.clientY)?.closest("[data-zone]"); t._skip=true; if(z) this.move(k,+z.dataset.zone); };
+        if(!moved) return; t._skip=true; ghost?.remove(); document.querySelectorAll(".xzone.over").forEach(z=>z.classList.remove("over"));
+        const z=document.elementFromPoint(ev.clientX,ev.clientY)?.closest("[data-zone]"); if(z) this.moveMany([...this.sel],+z.dataset.zone); };
       addEventListener("pointermove",mv); addEventListener("pointerup",up); });
-    t.addEventListener("click",e=>{ if(t._skip){ t._skip=false; e.stopImmediatePropagation(); } },true);
   },
-  move(k,g){ if(g<0) delete this.st.place[k]; else this.st.place[k]=g; this.sel=null; this.save(); this.render(); },
+  moveMany(keys,g){ keys.forEach(k=>{ if(g<0) delete this.st.place[k]; else this.st.place[k]=g; }); this.sel.clear(); this.save();
+    const y=scrollY; this.render(); scrollTo({top:y}); toast(g<0?`${keys.length}장을 뺐어요`:`${keys.length}장을 ${this.gname(g)}에 넣었어요`); },
   ready(){ const st=this.st, left=st.set.filter(k=>this.where(k)<0).length;
     if(left) return `아직 나누지 않은 사진이 ${left}장 있어요.`;
     const used=st.groups.map((g,i)=>({g,i})).filter(({i})=>st.set.some(k=>this.where(k)===i));
@@ -1182,6 +1235,189 @@ const explore={
     box.append(el("p",{class:"lead",style:"font-size:.88rem"},"이 화면을 캡처해서 패들렛에 올리고, 우리 모둠의 분류 기준을 발표해 봐요."));
     return box;
   }
+};
+
+/* ===================== 빛의 이동 시뮬레이션 ===================== */
+const SIM_TEXT={
+  emission:{title:"방출성운: 기체가 스스로 빛을 내요",steps:[
+    "뜨겁고 젊은 별이 강한 에너지(자외선, 보라색 점)를 내보내요.",
+    "성운 속 수소 기체가 그 에너지를 흡수해요. (기체가 반짝!)",
+    "에너지를 받은 기체가 스스로 붉은빛을 내보내요.",
+    "붉은빛이 관측자에게 와서 성운이 붉게 보여요."],
+    tip:"별의 온도를 '차가운 별'로 바꿔 보세요. 에너지가 약하면 기체가 빛나지 않아요!"},
+  reflection:{title:"반사성운: 먼지가 별빛을 반사해요",steps:[
+    "별이 여러 색이 섞인 빛(흰빛)을 내보내요.",
+    "빛이 성운 속 먼지 알갱이에 부딪혀요.",
+    "파란빛은 잘 튕겨 나가고, 붉은빛은 대부분 그냥 지나가요.",
+    "튕겨 나온 파란빛이 관측자에게 와서 성운이 파랗게 보여요."],
+    tip:"먼지는 스스로 빛을 내지 않아요. 별을 지우면 반사성운도 보이지 않아요. (하늘이 파란 것과 비슷한 원리예요)"},
+  dark:{title:"암흑성운: 먼지가 뒤쪽 별빛을 가려요",steps:[
+    "성운 뒤쪽의 별들이 빛을 내보내요.",
+    "빽빽한 가스와 먼지가 빛을 흡수하고 가려요.",
+    "성운 쪽에서는 빛이 거의 오지 못해 검게 보여요."],
+    tip:"먼지 양을 줄여 보세요. 가려지는 빛이 줄어들어요."}
+};
+const sim={
+  mode:"emission", run:false, speed:1, hot:true, dust:70, built:false, raf:0, visible:false,
+  build(){
+    if(this.built) return; this.built=true;
+    const host=$("#simHost");
+    host.innerHTML=`<div class="card sim">
+      <span class="kicker" style="font-weight:900;letter-spacing:.08em;color:var(--yellow)">SIMULATION</span>
+      <h2>빛의 이동 시뮬레이션</h2>
+      <p class="lead">방출성운과 반사성운에서 빛이 어떻게 움직여서 우리 눈에 들어오는지 직접 살펴봐요.</p>
+      <div class="seg" id="simMode"><button data-v="emission">방출성운</button><button data-v="reflection">반사성운</button><button data-v="dark">암흑성운</button></div>
+      <div class="simwrap">
+        <div class="simstage"><canvas id="simCv" aria-label="빛의 이동 시뮬레이션"></canvas></div>
+        <div class="simside">
+          <div class="simobs"><span class="lab">관측자 눈에 보이는 성운의 색</span><div class="sw" id="simSw"></div><b id="simSwName">-</b><small id="simCount"></small></div>
+          <h3 id="simTitle"></h3>
+          <ol class="simsteps" id="simSteps"></ol>
+          <p class="tipbox" id="simTip"></p>
+        </div>
+      </div>
+      <div class="simctl">
+        <button class="btn yellow" id="simPlay" type="button">재생</button>
+        <button class="btn" id="simReset" type="button">처음부터</button>
+        <label class="simr">속도 <input type="range" id="simSpeed" min="0.3" max="2" step="0.1" value="1"></label>
+        <div class="seg" id="simTemp"><button data-v="1">뜨거운 젊은 별</button><button data-v="0">차가운 별</button></div>
+        <label class="simr" id="simDustL">먼지 양 <input type="range" id="simDust" min="15" max="100" step="5" value="70"></label>
+      </div>
+      <div class="simleg" id="simLeg"></div>
+    </div>`;
+    this.cv=$("#simCv"); this.ctx=this.cv.getContext("2d");
+    $("#simMode").addEventListener("click",e=>{ const b=e.target.closest("button"); if(b){ this.mode=b.dataset.v; this.reset(); } });
+    $("#simTemp").addEventListener("click",e=>{ const b=e.target.closest("button"); if(b){ this.hot=b.dataset.v==="1"; this.reset(); } });
+    $("#simPlay").addEventListener("click",()=>this.toggle());
+    $("#simReset").addEventListener("click",()=>this.reset());
+    $("#simSpeed").addEventListener("input",e=>this.speed=+e.target.value);
+    $("#simDust").addEventListener("input",e=>{ this.dust=+e.target.value; this.reset(); });
+    addEventListener("resize",()=>{ if(this.built){ this.size(); this.layout(); this.draw(); } });
+    new IntersectionObserver(es=>{ this.visible=es[0].isIntersecting; if(this.visible&&!reduce&&!this.userPaused&&!this.run) this.toggle(true); if(!this.visible&&this.run) this.toggle(false,true); },{threshold:.25}).observe(this.cv);
+    this.reset();
+  },
+  toggle(force,auto){ this.run=force!==undefined?force:!this.run; if(!auto&&force===undefined) this.userPaused=!this.run;
+    $("#simPlay").textContent=this.run?"일시정지":"재생"; cancelAnimationFrame(this.raf); if(this.run){ this.last=performance.now(); this.raf=requestAnimationFrame(t=>this.loop(t)); } },
+  size(){ const w=this.cv.parentElement.clientWidth, h=Math.round(Math.min(420,Math.max(260,w*.62))); const d=devicePixelRatio||1;
+    this.cv.width=w*d; this.cv.height=h*d; this.cv.style.height=h+"px"; this.W=w; this.H=h; this.ctx.setTransform(d,0,0,d,0,0); },
+  rnd(a,b){ return a+Math.random()*(b-a); },
+  gauss(){ return (Math.random()+Math.random()+Math.random()-1.5)/1.5; },
+  layout(){
+    const W=this.W, H=this.H; this.u=W/600;
+    this.bg=Array.from({length:70},()=>({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.2+.3}));
+    this.obs={x:W-26,y:H/2};
+    this.srcs=null;
+    if(this.mode==="emission"){ this.star={x:W*.36,y:H*.5}; this.cloud={x:W*.38,y:H*.5,rx:W*.28,ry:H*.42}; }
+    else if(this.mode==="reflection"){ this.star={x:W*.16,y:H*.42}; this.cloud={x:W*.5,y:H*.52,rx:W*.2,ry:H*.38}; }
+    else { this.star=null; this.cloud={x:W*.5,y:H*.5,rx:W*.13,ry:H*.36}; this.srcs=Array.from({length:7},(_,i)=>({x:W*.05,y:H*(.1+.8*i/6)})); }
+    const n=this.mode==="emission"?70:Math.round((this.mode==="dark"?3.2:1.4)*this.dust);
+    const c=this.cloud; this.parts=[];
+    for(let i=0;i<n*4&&this.parts.length<n;i++){ const x=c.x+this.gauss()*c.rx, y=c.y+this.gauss()*c.ry;
+      if(((x-c.x)/c.rx)**2+((y-c.y)/c.ry)**2>1) continue;
+      if(this.star&&Math.hypot(x-this.star.x,y-this.star.y)<22*this.u) continue;
+      this.parts.push({x,y,ex:0,glow:0}); }
+  },
+  reset(){
+    [...$("#simMode").children].forEach(b=>b.setAttribute("aria-pressed",b.dataset.v===this.mode));
+    [...$("#simTemp").children].forEach(b=>b.setAttribute("aria-pressed",(b.dataset.v==="1")===this.hot));
+    $("#simTemp").hidden=this.mode!=="emission"; $("#simDustL").hidden=this.mode==="emission";
+    const T=SIM_TEXT[this.mode]; $("#simTitle").textContent=T.title; $("#simTip").textContent=T.tip;
+    $("#simSteps").innerHTML=T.steps.map(s=>`<li>${s}</li>`).join("");
+    $("#simLeg").innerHTML=this.mode==="emission"
+      ?`<span><i style="background:#b46bff"></i>강한 에너지(자외선, 눈에 안 보임)</span><span><i style="background:#fff6d8"></i>별빛</span><span><i style="background:#ff4f6e"></i>기체가 내는 붉은빛</span><span><i style="background:#e7a3b2;border-radius:50%"></i>수소 기체</span>`
+      :this.mode==="reflection"?`<span><i style="background:#ff6060"></i>붉은빛</span><span><i style="background:#62e08a"></i>초록빛</span><span><i style="background:#5aa8ff"></i>파란빛</span><span><i style="background:#9c7b5c;border-radius:50%"></i>먼지 알갱이</span>`
+      :`<span><i style="background:#fff6d8"></i>뒤쪽 별빛</span><span><i style="background:#5c4a3a;border-radius:50%"></i>빽빽한 가스·먼지</span>`;
+    this.P=[]; this.hits=[]; this.stage=0; this.cnt={direct:0,cloud:0,blocked:0,through:0,emit:0}; this.t=0;
+    this.size(); this.layout(); this.markStep(0); this.panel(); this.draw();
+  },
+  markStep(n){ if(n<this.stage) return; this.stage=Math.max(this.stage,n); [...$("#simSteps").children].forEach((li,i)=>li.classList.toggle("on",i<this.stage)); },
+  emit(){
+    const u=this.u, sp=2.1*u;
+    if(this.mode==="dark"){ for(const s of this.srcs){ if(Math.random()<.35){ const a=this.rnd(-.18,.18); this.P.push({x:s.x,y:s.y+this.rnd(-6,6),vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,c:"#fff6d8",k:"bg"}); } } this.markStep(1); return; }
+    const s=this.star, a=Math.random()*Math.PI*2, vx=Math.cos(a)*sp, vy=Math.sin(a)*sp;
+    if(this.mode==="emission"){
+      if(this.hot){ if(Math.random()<.65) this.P.push({x:s.x,y:s.y,vx,vy,c:"#b46bff",k:"uv"}); else this.P.push({x:s.x,y:s.y,vx,vy,c:"#fff6d8",k:"star"}); }
+      else { this.P.push({x:s.x,y:s.y,vx:vx*.9,vy:vy*.9,c:Math.random()<.5?"#ffb070":"#ff8a5c",k:"star"}); }
+    } else {
+      for(let j=0;j<2;j++){ const r=Math.random(), b=Math.random()*Math.PI*2; const col=r<1/3?["#ff6060","r"]:r<2/3?["#62e08a","g"]:["#5aa8ff","b"];
+        this.P.push({x:s.x,y:s.y,vx:Math.cos(b)*sp,vy:Math.sin(b)*sp,c:col[0],k:"star",ch:col[1]}); }
+    }
+    this.markStep(1);
+  },
+  step(dt){
+    const u=this.u, W=this.W, H=this.H, n=Math.max(1,Math.round(dt*this.speed));
+    for(let it=0;it<n;it++){
+      this.t++; if(this.t%2===0) this.emit();
+      for(const q of this.parts){ if(q.ex>0){ q.ex--; if(q.ex===0){ const a=Math.random()*Math.PI*2, sp=1.8*u; this.P.push({x:q.x,y:q.y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,c:"#ff4f6e",k:"ha"}); this.markStep(3); } } if(q.glow>0) q.glow-=.03; }
+      const R=7*u;
+      for(let i=this.P.length-1;i>=0;i--){ const p=this.P[i]; p.x+=p.vx; p.y+=p.vy;
+        // 성운 속 입자와 만남
+        if(!p.done&&((p.x-this.cloud.x)/this.cloud.rx)**2+((p.y-this.cloud.y)/this.cloud.ry)**2<1.05){
+          for(const q of this.parts){ if(Math.abs(p.x-q.x)>R||Math.abs(p.y-q.y)>R) continue;
+            if(this.mode==="emission"&&p.k==="uv"&&q.ex===0&&Math.random()<.5){ q.ex=Math.round(this.rnd(18,40)); q.glow=1; p.dead=true; this.markStep(2); break; }
+            if(this.mode==="reflection"&&p.k==="star"){ if(p.last===q) break; p.last=q; this.markStep(2);
+              const pr=p.ch==="b"?.5:p.ch==="g"?.07:.015;
+              if(Math.random()<pr){ const a=Math.random()*Math.PI*2, sp=Math.hypot(p.vx,p.vy); p.vx=Math.cos(a)*sp; p.vy=Math.sin(a)*sp; p.k="sc"; p.done=true; q.glow=1; if(p.ch==="b") this.markStep(3); }
+              break; }
+            if(this.mode==="dark"&&Math.random()<.5){ p.dead=true; q.glow=.6; this.cnt.blocked++; this.markStep(2); break; }
+          }
+        }
+        if(p.dead){ this.P.splice(i,1); continue; }
+        // 관측자 쪽(오른쪽 끝)에 도착
+        if(p.x>W-14){ const mid=Math.abs(p.y-H/2)<this.cloud.ry*.75;
+          if(this.mode==="emission"){ if(p.k==="ha"){ this.cnt.cloud++; this.hits.push(p.c); this.markStep(4); } else if(p.k==="star") this.cnt.direct++; }
+          else if(this.mode==="reflection"){ if(p.k==="sc"){ this.cnt.cloud++; this.hits.push(p.c); this.markStep(4); } else this.cnt.direct++; }
+          else { if(mid) this.cnt.through++; else this.cnt.direct++; if(this.cnt.through+this.cnt.direct>25) this.markStep(3); }
+          if(this.hits.length>80) this.hits.shift();
+          this.P.splice(i,1); continue; }
+        if(p.x<-10||p.y<-10||p.y>H+10) this.P.splice(i,1);
+      }
+    }
+    if(this.P.length>900) this.P.splice(0,this.P.length-900);
+    this.panel();
+  },
+  panel(){
+    const sw=$("#simSw"), nm=$("#simSwName"), ct=$("#simCount");
+    if(this.mode==="dark"){ const tot=this.cnt.through+this.cnt.blocked; const pass=tot?this.cnt.through/tot:1; const v=Math.round(20+200*pass);
+      sw.style.background=`radial-gradient(circle,#000 0 40%,rgb(${v},${v-10},${v-30}) 41%)`; nm.textContent=pass<.35?"가운데가 검게 보여요":"조금 어두워요";
+      ct.textContent=`성운 쪽으로 간 빛 중 ${Math.round((1-pass)*100)}%가 가려졌어요`; return; }
+    if(!this.hits.length){ sw.style.background="#0a0820"; nm.textContent=this.mode==="emission"&&!this.hot?"성운이 빛나지 않아요":"아직 빛이 오지 않았어요"; ct.textContent=""; return; }
+    let r=0,g=0,b=0; for(const c of this.hits){ r+=parseInt(c.slice(1,3),16); g+=parseInt(c.slice(3,5),16); b+=parseInt(c.slice(5,7),16); }
+    const k=this.hits.length; r=Math.round(r/k); g=Math.round(g/k); b=Math.round(b/k);
+    sw.style.background=`radial-gradient(circle,rgb(${r},${g},${b}) 0 45%,rgba(${r},${g},${b},.25) 75%,transparent)`;
+    nm.textContent=r>b+40?"붉은색":b>r+30?"파란색":"여러 색이 섞인 색"; if(this.hits.length<6) nm.textContent+=" (빛을 모으는 중…)";
+    ct.textContent=`성운에서 온 빛 ${this.cnt.cloud}개 · 별에서 바로 온 빛 ${this.cnt.direct}개`;
+  },
+  draw(){
+    const x=this.ctx, W=this.W, H=this.H, u=this.u;
+    x.fillStyle="#07061a"; x.fillRect(0,0,W,H);
+    x.fillStyle="#ffffff55"; for(const s of this.bg){ x.beginPath(); x.arc(s.x,s.y,s.r,0,6.28); x.fill(); }
+    // 성운 구름
+    const c=this.cloud, g=x.createRadialGradient(c.x,c.y,0,c.x,c.y,Math.max(c.rx,c.ry));
+    const col=this.mode==="emission"?(this.stage>=3?"255,80,110":"200,170,190"):this.mode==="reflection"?(this.stage>=3?"90,160,255":"180,170,160"):"40,30,25";
+    g.addColorStop(0,`rgba(${col},${this.mode==="dark"?.95:.28})`); g.addColorStop(1,`rgba(${col},0)`);
+    x.save(); x.translate(c.x,c.y); x.scale(c.rx/Math.max(c.rx,c.ry),c.ry/Math.max(c.rx,c.ry)); x.translate(-c.x,-c.y);
+    x.fillStyle=g; x.beginPath(); x.arc(c.x,c.y,Math.max(c.rx,c.ry),0,6.28); x.fill(); x.restore();
+    // 기체·먼지 입자
+    for(const q of this.parts){
+      if(this.mode==="emission"){ x.fillStyle=q.glow>0?`rgba(255,${120-80*q.glow},${150-60*q.glow},${.5+.5*q.glow})`:"rgba(231,163,178,.55)"; x.beginPath(); x.arc(q.x,q.y,(2.2+3*Math.max(0,q.glow))*u,0,6.28); x.fill(); }
+      else { x.fillStyle=this.mode==="dark"?"rgba(92,74,58,.9)":(q.glow>0?`rgba(170,200,255,${.4+.6*q.glow})`:"rgba(156,123,92,.8)"); x.beginPath(); x.arc(q.x,q.y,(this.mode==="dark"?2.6:2)*u,0,6.28); x.fill(); }
+    }
+    // 별
+    const drawStar=(s,r,colA,colB)=>{ const sg=x.createRadialGradient(s.x,s.y,0,s.x,s.y,r*3); sg.addColorStop(0,colA); sg.addColorStop(.3,colB); sg.addColorStop(1,"rgba(0,0,0,0)"); x.fillStyle=sg; x.beginPath(); x.arc(s.x,s.y,r*3,0,6.28); x.fill(); };
+    if(this.star){ const hot=this.mode!=="emission"||this.hot; drawStar(this.star,9*u,hot?"#ffffff":"#fff0d0",hot?"rgba(150,190,255,.8)":"rgba(255,150,80,.8)");
+      x.fillStyle="#fff"; x.font=`bold ${Math.max(11,12*u)}px "Malgun Gothic",sans-serif`; x.fillText(this.mode==="emission"?(this.hot?"뜨겁고 젊은 별":"차가운 별"):"밝은 별",this.star.x-30*u,this.star.y-24*u); }
+    if(this.srcs) for(const s of this.srcs) drawStar(s,5*u,"#ffffff","rgba(255,240,200,.7)");
+    // 빛 알갱이
+    for(const p of this.P){ x.strokeStyle=p.c; x.lineWidth=(p.k==="uv"?1.6:2)*u; x.globalAlpha=p.k==="uv"?.75:1;
+      x.beginPath(); x.moveTo(p.x-p.vx*3,p.y-p.vy*3); x.lineTo(p.x,p.y); x.stroke(); }
+    x.globalAlpha=1;
+    // 관측자
+    const o=this.obs; x.fillStyle="#2a2468"; x.fillRect(W-30,0,30,H); x.fillStyle="#ffd166";
+    x.beginPath(); x.ellipse(o.x+4,o.y,9*u,6*u,0,0,6.28); x.fill(); x.fillStyle="#2b2250"; x.beginPath(); x.arc(o.x+3,o.y,3*u,0,6.28); x.fill();
+    x.save(); x.translate(W-8,H/2+40*u); x.rotate(-Math.PI/2); x.fillStyle="#c3bbef"; x.font=`bold ${Math.max(10,11*u)}px "Malgun Gothic",sans-serif`; x.fillText("관측자(지구)",0,0); x.restore();
+  },
+  loop(t){ if(!this.run) return; const dt=Math.min(3,(t-this.last)/16.7); this.last=t; this.step(dt); this.draw(); this.raf=requestAnimationFrame(tt=>this.loop(tt)); }
 };
 
 /* ===================== 우주 DNA 포스터 (8단계) ===================== */
@@ -1474,7 +1710,8 @@ $("#gdExplore").addEventListener("click",()=>closeGuide("explore"));
 guide.addEventListener("click",e=>{ if(e.target===guide) closeGuide(); });
 document.addEventListener("keydown",e=>{ if(e.key==="Escape" && !guide.hidden) closeGuide(); });
 const first=location.hash.slice(1);
-showTab(["explore","learn","game","gallery","dna","make"].includes(first)?first:"explore");
+showTab(first==="sim"?"learn":["explore","learn","game","gallery","dna","make"].includes(first)?first:"explore");
+if(first==="sim") setTimeout(()=>$("#simHost").scrollIntoView({behavior:"smooth"}),300);
 if(!first && !store.get("nebula-guide",0)) openGuide();
 </script>
 </body>
