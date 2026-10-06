@@ -379,6 +379,25 @@ textarea{resize:vertical;min-height:70px}
 .roombox{display:grid;gap:6px;justify-items:center;width:min(320px,100%)}
 .roombox input{text-align:center;font-weight:800}
 .rfoot{justify-content:flex-end}
+/* 일상 속 비유 */
+.analog{display:grid;gap:14px}
+.an2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:14px}
+.anc{border-radius:20px;padding:16px;display:grid;gap:10px;align-content:start}
+.anc.em{background:#ff7b9c22;border:2px solid #ff7b9c66}
+.anc.re{background:#7cc4ff22;border:2px solid #7cc4ff66}
+.anc.du{background:#c2b2ec1f;border:2px solid #c2b2ec55}
+.anc h3{font-size:1.15rem}
+.pair2{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;text-align:center}
+.pair2 .eq{font-size:1.4rem;font-weight:900;color:var(--mute)}
+.pic{background:#0c0a26;border-radius:14px;padding:12px 8px;display:grid;gap:4px;justify-items:center}
+.pic .ico{font-size:2.2rem;line-height:1}
+.pic small{color:var(--mute);font-size:.78rem}
+.anc ul{margin:0;padding-left:1.1em;display:grid;gap:4px;font-size:.92rem}
+.ansum{background:var(--yellow);color:#2b2250;border-radius:999px;padding:10px 18px;font-weight:900;text-align:center}
+/* 화면 캡처용(?shot=) */
+html.shot header.top,html.shot nav.tabs,html.shot footer{display:none!important}
+html.shot .wrap{padding-block:16px 0}
+html.shot .hide-in-shot,html.shot #confetti,html.shot .toast{display:none!important}
 #confetti{position:fixed;inset:0;z-index:55;pointer-events:none}
 .helpbtn{margin-left:auto;flex:none}
 .bubble+.helpbtn{margin-left:0}
@@ -487,6 +506,32 @@ footer{position:relative;z-index:1;color:var(--dim);font-size:.8rem;max-width:11
         <p class="ex">예: 말머리 성운(오리온자리), 바너드 68, 파이프 성운</p>
       </article>
     </div>
+  </div>
+
+  <div class="card analog">
+    <span class="kicker" style="font-weight:900;letter-spacing:.08em;color:var(--yellow)">우리 주변에서 찾기</span>
+    <h2>스스로 빛날까? 비춰야 보일까?</h2>
+    <div class="an2">
+      <div class="anc em">
+        <h3><span class="chip t-emission"><span>방출성운</span></span> = 휴대폰 화면</h3>
+        <div class="pair2"><div class="pic"><span class="ico">📱</span><b>우리 주변</b><small>불을 꺼도 보여요 (스스로 빛)</small></div><span class="eq">=</span><div class="pic"><span class="ico">⭐➜🔴</span><b>우주</b><small>뜨거운 별의 에너지로 가스가 빛나요</small></div></div>
+        <ul><li><b>빛</b> 에너지를 받아 스스로 빛을 내요</li><li><b>색</b> 붉은색 - 수소 가스의 빛이 원래 붉어요</li><li><b>복습</b> 광원 - 스스로 빛을 내는 물체 (중1)</li></ul>
+      </div>
+      <div class="anc re">
+        <h3><span class="chip t-reflection"><span>반사성운</span></span> = 종이 책</h3>
+        <div class="pair2"><div class="pic"><span class="ico">💡📖</span><b>우리 주변</b><small>빛을 비춰야 보여요 (반사)</small></div><span class="eq">=</span><div class="pic"><span class="ico">⭐➜☁️</span><b>우주</b><small>별빛을 받아 파랗게 반짝여요</small></div></div>
+        <ul><li><b>빛</b> 스스로 못 빛나고, 별빛을 튕겨 보내요</li><li><b>색</b> 파란색 - 하늘처럼 파란빛이 잘 튕겨요</li><li><b>복습</b> 칠판·책 - 빛이 반사되어야 보여요 (중1)</li></ul>
+      </div>
+    </div>
+    <div class="anc du">
+      <h3>먼지가 아주 많아지면?</h3>
+      <div class="an2">
+        <div class="pic"><span class="ico">🎬</span><b>영화관 빛줄기</b><small>먼지 조금: 빛줄기만 → 먼지 가득: 방 전체가 뿌옇게, 스크린은 어둡게</small></div>
+        <div class="pic"><span class="ico">🚗🌫️</span><b>안개 낀 날 자동차 전조등</b><small>먼지 조금: 빛줄기만 → 먼지 가득: 차 둘레는 뿌옇게, 뒤 나무는 가려져요</small></div>
+      </div>
+    </div>
+    <p class="ansum">빛을 받는 먼지가 많으면 뿌옇게 빛나요 = 반사성운 &nbsp;|&nbsp; 너무 빽빽해 뒤쪽 빛을 가리면 = 암흑성운</p>
+    <p class="lead" style="font-size:.88rem">아래 시뮬레이션에서 빛이 어떻게 움직이는지 직접 확인해 봐요.</p>
   </div>
 
   <div id="simHost"></div>
@@ -1811,6 +1856,33 @@ else showTab(first==="sim"?"learn":["explore","learn","game","gallery","dna","ma
 if(first==="sim") setTimeout(()=>$("#simHost").scrollIntoView({behavior:"smooth"}),300);
 if(!first && !store.get("nebula-guide",0)) openGuide();
 if(first==="rank") $("#tab-game").scrollIntoView();
+
+/* ===================== 화면 캡처용 장면 (?shot=이름) : 수업 PPT에 넣을 화면을 만들 때만 씀 ===================== */
+(function(){
+  const shot=new URLSearchParams(location.search).get("shot"); if(!shot) return;
+  document.documentElement.classList.add("shot"); guide.hidden=true;
+  const only=(sec,keep)=>document.querySelectorAll(sec+" > *").forEach(n=>{ if(!keep.some(k=>n.matches(k))) n.classList.add("hide-in-shot"); });
+  const S={
+    explore(){ showTab("explore"); const st=explore.fresh(); const cl=st.set.filter(k=>["open","globular"].includes(BYK[k].t)), ne=st.set.filter(k=>!cl.includes(k));
+      cl.slice(0,3).forEach(k=>st.place[k]=0); ne.slice(0,3).forEach(k=>st.place[k]=1);
+      st.groups=[{name:"점 무리",crit:"작은 점들이 모여 있어요"},{name:"구름 무리",crit:"구름처럼 퍼져 있어요"}];
+      explore.st=st; explore.sel=new Set([cl[3],ne[3],ne[4]].filter(Boolean)); explore.render(); only("#tab-explore",["#explore"]); },
+    reveal(){ showTab("explore"); const st=explore.fresh(); st.set.forEach(k=>st.place[k]=["open","globular"].includes(BYK[k].t)?0:1);
+      st.groups=[{name:"점 무리",crit:"작은 점들이 모여 있어요"},{name:"구름 무리",crit:"구름처럼 퍼져 있어요"}]; st.revealed=true;
+      explore.st=st; explore.render(); only("#tab-explore",["#explore"]); document.querySelectorAll("#explore > .card:not(.xsci)").forEach(n=>n.classList.add("hide-in-shot")); },
+    sim(){ showTab("learn"); only("#tab-learn",["#simHost"]); sim.build(); sim.toggle(false); sim.mode=new URLSearchParams(location.search).get("m")||"emission"; sim.reset(); sim.speed=1; const N=sim.mode==="reflection"?2600:600; for(let i=0;i<N;i++) sim.step(1); sim.draw(); },
+    game(){ store.set("nebula-room","2-3"); showTab("game"); game.player="가온"; game.mode="adv"; game.kind="ten"; game.start(); },
+    rank(){ store.set("nebula-room","2-3"); const d=today();
+      store.set("nebula-rank",[["가온",170,10,10],["나래",146,9,8],["다온",118,8,5],["라온",96,7,4],["마루",70,6,3]].map(([n,sc,ok,c])=>({room:"2-3",name:n,score:sc,ok,n:10,combo:c,mode:"adv-ten",day:d,time:new Date().toISOString()})));
+      showTab("game"); game.player="다온"; game.mode="adv"; game.kind="ten"; game.board(); },
+    make(){ showTab("make"); maker.setType("globular"); $("#mTemp").value=80; $("#mName").value="우정의 별무리"; $("#mDist").value=22000; $("#mDesc").value="늙은 별들이 공 모양으로 빽빽하게 모여 있는 구상성단이다."; $("#mMaker").value="2학년 3반 가온"; maker.update(); maker.draw(); only("#tab-make",[".maker"]); },
+    dna(){ store.set("nebula-dna",{}); dna.st=null; dna.load(); const st=dna.st;
+      st.mbti={EI:"E",SN:"N",TF:"F",JP:"P"}; st.sv={season:"여름",word:"활발한",social:"여럿이 북적북적 함께하는 게 좋아",mood:"웅장한",value:"우정"};
+      st.interest="고양이"; st.obj="globular"; st.title="우정의 구상성단"; st.imgPrompt=dna.makeImgPrompt(); st.posterPrompt=dna.makePosterPrompt();
+      st.step=+(new URLSearchParams(location.search).get("step")||3); st.max=7; showTab("dna"); dna.render(); only("#tab-dna",["#dna"]); }
+  };
+  (S[shot]||(()=>{}))(); scrollTo(0,0);
+})();
 </script>
 </body>
 </html>
