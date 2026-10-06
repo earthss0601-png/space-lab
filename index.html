@@ -353,6 +353,32 @@ textarea{resize:vertical;min-height:70px}
 .simr input{width:130px}
 .simleg{display:flex;flex-wrap:wrap;gap:14px;font-size:.82rem;color:var(--mute)}
 .simleg i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+/* 랭킹 */
+.rankcard{display:grid;gap:12px;width:min(560px,100%);text-align:left}
+.rankcard.big{width:min(900px,100%);margin:0 auto}
+.rhead{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:baseline;justify-content:space-between}
+.rhead h3{font-size:1.3rem}
+.rankcard.big .rhead h3{font-size:2rem}
+.rsub{color:var(--dim);font-size:.82rem}
+.rseg{flex-wrap:wrap;border-radius:18px}
+.rlist{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.rlist li{display:grid;grid-template-columns:36px minmax(0,1fr) auto;grid-template-rows:auto auto;column-gap:10px;align-items:center;background:#ffffff0d;border-radius:14px;padding:8px 12px;animation:pop-in .4s both;animation-delay:var(--d,0s)}
+.rlist .medal{grid-row:1/3;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font-weight:900;background:#ffffff14;font-variant-numeric:tabular-nums}
+.rlist .rn{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rlist .rs{font-weight:900;color:var(--yellow);font-variant-numeric:tabular-nums}
+.rlist small{grid-column:2/4;color:var(--dim);font-size:.75rem}
+.rlist .r1 .medal{background:#ffd166;color:#3a2a00;box-shadow:0 0 14px #ffd16699}
+.rlist .r2 .medal{background:#d9dde8;color:#2b2250}
+.rlist .r3 .medal{background:#e3a26b;color:#3a1f08}
+.rlist .r1{background:linear-gradient(90deg,#ffd16633,#ffffff0d)}
+.rlist li.me{outline:2px solid var(--pink)}
+.rlist li.sep{margin-top:8px}
+.rlist .rempty{display:block;color:var(--mute);text-align:center;padding:16px}
+.rankcard.big .rlist li{padding:12px 18px;font-size:1.25rem;grid-template-columns:52px minmax(0,1fr) auto}
+.rankcard.big .rlist .medal{width:44px;height:44px}
+.roombox{display:grid;gap:6px;justify-items:center;width:min(320px,100%)}
+.roombox input{text-align:center;font-weight:800}
+.rfoot{justify-content:flex-end}
 #confetti{position:fixed;inset:0;z-index:55;pointer-events:none}
 .helpbtn{margin-left:auto;flex:none}
 .bubble+.helpbtn{margin-left:0}
@@ -777,14 +803,25 @@ const game={
       <p class="lead">NASA 사진이 하나씩 랜덤으로 나와요. ${TOUCH?"알맞은 <b>상자를 눌러서</b> 분류해요.":"사진을 <b>알맞은 상자로 끌어다 놓거나</b> 상자를 눌러 분류해요."}<br>연속으로 맞히면 <b>콤보 점수</b>가 붙어요!</p>
       <div style="display:grid;gap:10px;justify-items:center"><span class="lead">상자 종류</span><div class="seg" id="sMode"><button data-v="basic">기초 · 성단 / 성운</button><button data-v="adv">심화 · 5가지</button></div></div>
       <div style="display:grid;gap:10px;justify-items:center"><span class="lead">도전 방법</span><div class="seg" id="sKind"><button data-v="ten">10문제</button><button data-v="speed">60초 스피드</button></div></div>
-      <div class="namebox"><label class="lead" for="pName">내 이름 (결과 화면에 나와요)</label><input type="text" id="pName" maxlength="20" placeholder="예: 2-3 김별"></div>
-      <button class="btn yellow" id="sGo" style="font-size:1.15rem;padding:14px 30px">시작하기</button>`;
+      <div class="namebox"><label class="lead" for="pName">내 이름 (랭킹에 나와요)</label><input type="text" id="pName" maxlength="12" placeholder="예: 김별"></div>
+      <div class="roombox"><label class="lead" for="pRoom">우리 반 코드 (선생님이 알려 줘요)</label><input type="text" id="pRoom" maxlength="10" placeholder="예: 2-3"></div>
+      <div class="actions" style="justify-content:center"><button class="btn yellow" id="sGo" style="font-size:1.15rem;padding:14px 30px">시작하기</button><button class="btn" id="sRank" type="button">🏆 랭킹 보기</button></div>`;
     g.append(s);
     const seg=(id,key)=>{ const box=s.querySelector(id); const upd=()=>[...box.children].forEach(b=>b.setAttribute("aria-pressed",b.dataset.v===this[key])); box.addEventListener("click",e=>{ const b=e.target.closest("button"); if(b){ this[key]=b.dataset.v; upd(); } }); upd(); };
     seg("#sMode","mode"); seg("#sKind","kind");
     const nm=s.querySelector("#pName"); nm.value=store.get("nebula-name","");
     nm.addEventListener("input",()=>store.set("nebula-name",nm.value.trim()));
-    s.querySelector("#sGo").addEventListener("click",()=>{ this.player=nm.value.trim(); this.start(); });
+    const rm=s.querySelector("#pRoom"); rm.value=rank.room(); rm.addEventListener("input",()=>store.set("nebula-room",rm.value.trim()));
+    s.querySelector("#sRank").addEventListener("click",()=>this.board());
+    s.querySelector("#sGo").addEventListener("click",()=>{ this.player=nm.value.trim(); store.set("nebula-room",rm.value.trim());
+      if(!this.player){ toast("랭킹에 오를 이름을 적어 주세요."); nm.focus(); return; }
+      if(!rm.value.trim()){ toast("우리 반 코드를 적어 주세요. (예: 2-3)"); rm.focus(); return; }
+      this.start(); });
+  },
+  board(live){
+    clearInterval(this.timer); const g=$("#game"); g.innerHTML="";
+    rank.board(g,{mode:`${this.mode}-${this.kind}`,me:live?null:(this.player||store.get("nebula-name","")),big:!!live,live:true});
+    const back=el("button",{class:"btn",type:"button",style:"justify-self:center"},"게임 화면으로"); back.addEventListener("click",()=>this.home()); g.append(back);
   },
   deck(){
     // 종류가 고르게 섞이도록 종류별로 섞은 뒤 번갈아 뽑기
@@ -889,11 +926,11 @@ const game={
     clearInterval(this.timer);
     const n=this.log.length, ok=this.log.filter(x=>x.ok).length, rate=n?ok/n:0;
     const stars=rate>=.9?3:rate>=.7?2:rate>=.4?1:0;
-    const rank=stars===3?"성운·성단 박사":stars===2?"우주 관측 대원":stars===1?"꼬마 천문학자":"우주 견습생";
+    const rankName=stars===3?"성운·성단 박사":stars===2?"우주 관측 대원":stars===1?"꼬마 천문학자":"우주 견습생";
     const g=$("#game"); g.innerHTML="";
     const R=el("div",{class:"card result"});
     R.innerHTML=`${mascotSVG("mascotRes")}<div class="stars3">${[1,2,3].map(i=>`<span class="${i<=stars?"on":""}">★</span>`).join("")}</div>
-      <span class="tag">${esc(this.player||"이름 없음")} · ${new Date().toLocaleDateString("ko-KR")} · ${this.mode==="basic"?"기초":"심화"} ${this.kind==="ten"?"10문제":"60초 스피드"}</span><div class="score">${this.score}점</div><p class="rank">${rank}</p><p class="lead">${n}장 중 ${ok}장 정답 · 최고 콤보 ${this.best}</p>`;
+      <span class="tag">${esc(this.player||"이름 없음")} · ${new Date().toLocaleDateString("ko-KR")} · ${this.mode==="basic"?"기초":"심화"} ${this.kind==="ten"?"10문제":"60초 스피드"}</span><div class="score">${this.score}점</div><p class="rank">${rankName}</p><p class="lead">${n}장 중 ${ok}장 정답 · 최고 콤보 ${this.best}</p>`;
     const rows=el("div",{class:"rows"});
     ORDER.forEach(t=>{ const L=this.log.filter(x=>x.p.t===t); if(!L.length) return; const c=L.filter(x=>x.ok).length;
       rows.append(el("div",{},`${chip(t)}<div class="progress"><i style="width:${c/L.length*100}%"></i></div><span>${c}/${L.length}</span>`)); });
@@ -906,6 +943,13 @@ const game={
     const again=el("button",{class:"btn yellow",type:"button"},"다시 도전"); again.addEventListener("click",()=>this.start());
     const home=el("button",{class:"btn",type:"button"},"방법 바꾸기"); home.addEventListener("click",()=>this.home());
     act.append(again,home); R.append(act); g.append(R);
+    const modeKey=`${this.mode}-${this.kind}`, status=el("p",{class:"lead",style:"font-size:.85rem"},"랭킹에 점수를 올리는 중…");
+    R.insertBefore(status,act);
+    rank.submit({room:rank.room(),name:this.player,score:this.score,ok,n,combo:this.best,mode:modeKey}).then(r=>{
+      status.textContent=r.ok?(r.local?"이 기기 랭킹에 기록했어요.":"우리 반 랭킹에 올렸어요!"):r.msg;
+      const host=el("div",{style:"display:grid;justify-items:center;width:100%"}); R.insertBefore(host,act);
+      rank.board(host,{mode:modeKey,me:this.player});
+    });
     const best=store.get("nebula-best",0); if(this.score>best){ store.set("nebula-best",this.score); if(best) R.querySelector(".lead").insertAdjacentHTML("afterend",`<p class="rank" style="color:var(--yellow)">새 최고 기록!</p>`); }
     say(stars>=2?"정말 멋져! 너는 우주 탐험가야!":"한 번 더 하면 분명 더 잘할 거야!");
     if(stars>=2){ const b=R.querySelector(".stars3").getBoundingClientRect(); setTimeout(()=>confetti(b.left+b.width/2,b.top+20,120),500); }
@@ -1090,6 +1134,58 @@ const maker={
     $("#mSave").addEventListener("click",e=>{ this.dex.unshift({P:this.params(),M:this.meta()}); const saved=store.set("nebula-lab-dex",this.dex); this.drawDex();
       toast(saved?"내 도감에 추가했어요!":"도감에 추가했어요 (창을 닫으면 사라져요)"); const r=e.target.getBoundingClientRect(); confetti(r.left+r.width/2,r.top,50); mood($("#mascotTop"),"happy"); });
     this.setType("emission",true); this.loadDex(); }
+};
+
+/* ===================== 분류 게임 랭킹 ===================== */
+// 선생님 구글 시트(Apps Script 웹 앱) 주소. 비어 있으면 '이 기기 랭킹'으로 작동해요.
+const RANK_URL="";
+const RANK_MODES=[["adv-ten","심화 · 10문제"],["basic-ten","기초 · 10문제"],["adv-speed","심화 · 60초"],["basic-speed","기초 · 60초"]];
+const today=()=>{ const d=new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`; };
+const rank={
+  online:!!RANK_URL,
+  room(){ return (new URLSearchParams(location.search).get("room")||store.get("nebula-room","")||"").trim(); },
+  // 같은 이름은 최고 점수만, 점수 → 정답 수 → 빠른 시간 순
+  best(rows){ const m=new Map(); for(const r of rows){ const k=r.name; const o=m.get(k); if(!o||r.score>o.score||(r.score===o.score&&r.ok>o.ok)) m.set(k,r); }
+    return [...m.values()].sort((a,b)=>b.score-a.score||b.ok-a.ok||String(a.time).localeCompare(String(b.time))); },
+  local(){ return store.get("nebula-rank",[]); },
+  async submit(e){
+    if(!e.name) return {ok:false,msg:"이름이 없어서 랭킹에 올리지 않았어요."};
+    e.day=today(); e.time=new Date().toISOString();
+    if(!this.online){ const L=this.local(); L.push(e); store.set("nebula-rank",L.slice(-500)); return {ok:true,local:true}; }
+    try{ const r=await fetch(RANK_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(e)}); const j=await r.json(); return j.ok?{ok:true}:{ok:false,msg:j.error||"랭킹에 올리지 못했어요."}; }
+    catch(err){ return {ok:false,msg:"인터넷 연결을 확인해 주세요. 랭킹에 올리지 못했어요."}; }
+  },
+  async list(room,mode){
+    if(!this.online) return this.best(this.local().filter(r=>r.room===room&&r.mode===mode&&r.day===today()));
+    const q=new URLSearchParams({room,mode,day:today()});
+    const r=await fetch(`${RANK_URL}?${q}`); const j=await r.json(); if(!j.ok) throw new Error(j.error||"error");
+    return this.best(j.rows||[]);
+  },
+  // 랭킹판 그리기
+  board(host,{mode,me,big=false,live=false}={}){
+    const room=this.room();
+    const card=el("div",{class:"card rankcard"+(big?" big":"")});
+    card.innerHTML=`<div class="rhead"><h3>🏆 ${room?esc(room)+" ":""}오늘의 랭킹</h3><span class="rsub">${this.online?"우리 반 모두의 점수":"이 기기에서 한 점수"} · ${today().replace(/-/g,". ")}.</span></div>`;
+    const seg=el("div",{class:"seg rseg"});
+    RANK_MODES.forEach(([k,l])=>{ const b=el("button",{type:"button","aria-pressed":k===mode},l); b.addEventListener("click",()=>{ mode=k; [...seg.children].forEach(x=>x.setAttribute("aria-pressed",x===b)); load(); }); seg.append(b); });
+    const list=el("ol",{class:"rlist"}); const foot=el("div",{class:"actions rfoot"});
+    const re=el("button",{class:"btn sm",type:"button"},"새로고침"); re.addEventListener("click",()=>load()); foot.append(re);
+    card.append(seg,list,foot); host.append(card);
+    const load=async()=>{
+      if(!room){ list.innerHTML=`<li class="rempty">반 코드를 넣으면 우리 반 랭킹을 볼 수 있어요.</li>`; return; }
+      let rows; try{ rows=await this.list(room,mode); }catch(e){ list.innerHTML=`<li class="rempty">랭킹을 불러오지 못했어요. 인터넷 연결을 확인해 주세요.</li>`; return; }
+      if(!card.isConnected) return;
+      if(!rows.length){ list.innerHTML=`<li class="rempty">아직 기록이 없어요. 첫 번째 주인공이 되어 봐요!</li>`; return; }
+      const N=big?20:10; let html="";
+      rows.slice(0,N).forEach((r,i)=>{ html+=`<li class="r${i<3?i+1:""}${me&&r.name===me?" me":""}" style="--d:${i*.05}s"><span class="medal">${i+1}</span><b class="rn">${esc(r.name)}</b><span class="rs">${r.score}점</span><small>${r.ok}/${r.n} · 콤보 ${r.combo}</small></li>`; });
+      const myi=me?rows.findIndex(r=>r.name===me):-1;
+      if(myi>=N){ const r=rows[myi]; html+=`<li class="me sep" style="--d:.5s"><span class="medal">${myi+1}</span><b class="rn">${esc(r.name)}</b><span class="rs">${r.score}점</span><small>${r.ok}/${r.n} · 콤보 ${r.combo}</small></li>`; }
+      list.innerHTML=html;
+    };
+    load();
+    if(live){ const t=setInterval(()=>{ if(!card.isConnected) return clearInterval(t); if(!document.hidden) load(); },10000); }
+    return card;
+  }
 };
 
 /* ===================== 사진 탐구 (나만의 기준으로 나누기) ===================== */
@@ -1710,9 +1806,11 @@ $("#gdExplore").addEventListener("click",()=>closeGuide("explore"));
 guide.addEventListener("click",e=>{ if(e.target===guide) closeGuide(); });
 document.addEventListener("keydown",e=>{ if(e.key==="Escape" && !guide.hidden) closeGuide(); });
 const first=location.hash.slice(1);
-showTab(first==="sim"?"learn":["explore","learn","game","gallery","dna","make"].includes(first)?first:"explore");
+if(first==="rank"){ showTab("game"); game.board(true); }
+else showTab(first==="sim"?"learn":["explore","learn","game","gallery","dna","make"].includes(first)?first:"explore");
 if(first==="sim") setTimeout(()=>$("#simHost").scrollIntoView({behavior:"smooth"}),300);
 if(!first && !store.get("nebula-guide",0)) openGuide();
+if(first==="rank") $("#tab-game").scrollIntoView();
 </script>
 </body>
 </html>
